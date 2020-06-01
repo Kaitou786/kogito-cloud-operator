@@ -197,7 +197,7 @@ func setReplicas(kogitoApp *v1alpha1.KogitoApp, dc *appsv1.DeploymentConfig) {
 // SetInfinispanEnvVars sets Infinispan variables to the given KogitoApp instance DeploymentConfig by reading information from the KogitoInfra
 func SetInfinispanEnvVars(cli *client.Client, kogitoInfra *v1alpha1.KogitoInfra, kogitoApp *v1alpha1.KogitoApp, dc *appsv1.DeploymentConfig) error {
 	if dc != nil && kogitoApp != nil &&
-		(kogitoInfra != nil && &kogitoInfra.Status != nil && &kogitoInfra.Status.Infinispan != nil) {
+		kogitoInfra != nil  {
 		uri, err := infrastructure.GetInfinispanServiceURI(cli, kogitoInfra)
 		if err != nil {
 			return err
@@ -226,7 +226,7 @@ func SetInfinispanEnvVars(cli *client.Client, kogitoInfra *v1alpha1.KogitoInfra,
 // SetKafkaEnvVars sets Kafka variables to the given KogitoApp instance DeploymentConfig by reading information from the KogitoInfra
 func SetKafkaEnvVars(cli *client.Client, kogitoInfra *v1alpha1.KogitoInfra, kogitoApp *v1alpha1.KogitoApp, dc *appsv1.DeploymentConfig) error {
 	if dc != nil && kogitoApp != nil &&
-		(kogitoInfra != nil && &kogitoInfra.Status != nil && &kogitoInfra.Status.Kafka != nil) {
+		(kogitoInfra != nil && len(kogitoInfra.Status.Kafka.Condition) > 0) {
 		uri, err := infrastructure.GetKafkaServiceURI(cli, kogitoInfra)
 		if err != nil {
 			return err

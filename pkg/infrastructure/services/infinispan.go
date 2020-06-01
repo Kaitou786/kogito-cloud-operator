@@ -80,13 +80,13 @@ var (
 
 // setInfinispanVariables binds Infinispan properties in the container.
 // If credentials are enabled, uses the given secret as a reference (use FetchInfinispanCredentials to get the secret)
-func setInfinispanVariables(runtime v1alpha1.RuntimeType, infinispanProps v1alpha1.InfinispanConnectionProperties, secret *corev1.Secret, container *corev1.Container) {
+func setInfinispanVariables(runtime v1alpha1.RuntimeType, infinispanProps *v1alpha1.InfinispanConnectionProperties, secret *corev1.Secret, container *corev1.Container) {
 	vars := envVarInfinispanQuarkus
 	if runtime == v1alpha1.SpringbootRuntimeType {
 		vars = envVarInfinispanSpring
 	}
 
-	if &infinispanProps.Credentials != nil &&
+	if infinispanProps != nil &&
 		len(infinispanProps.Credentials.SecretName) > 0 &&
 		secret != nil &&
 		container != nil {
@@ -157,7 +157,7 @@ func deployInfinispanWithKogitoInfra(instance v1alpha1.InfinispanAware, namespac
 		return false, 0, nil
 	}
 
-	// Overrides any parameters not set
+	// instanceOverrides any parameters not set
 	if instance.GetInfinispanProperties().UseKogitoInfra {
 		// ensure infra
 		infra, ready, err := infrastructure.EnsureKogitoInfra(namespace, cli).WithInfinispan().Apply()
