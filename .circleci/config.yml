@@ -9,10 +9,12 @@ jobs:
         environment: 
           - GO111MODULE=on
           - GOLANG_LINT_VERSION=v1.27.0
+          - COVERALLS_TOKEN=bO2QMP83jVaKiAOxWnsLZw2Wcp07cV99Q
 
     working_directory: /go/src/github.com/kiegroup/kogito-cloud-operator
     steps:
       - run: go get -u golang.org/x/lint/golint
+      - run: go get github.com/mattn/goveralls
       - run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin $GOLANG_LINT_VERSION
       - checkout
       - run: go mod tidy
@@ -20,8 +22,26 @@ jobs:
       - run: go vet ./...
       - run: golangci-lint run ./...
       - run: ./hack/go-lint.sh
-      - run: CGO_ENABLED=0 go test ./cmd/... -count=1 -p=1
-      - run: CGO_ENABLED=0 go test ./pkg/... -count=1 -p=1
-      - run: git clone https://github.com/bats-core/bats-core.git
-      - run: cd bats-core && ./install.sh $HOME
-      - run: $HOME/bin/bats hack/*.bats
+      - run: go test ./pkg/...  -p=1  -coverprofile=coverage.out
+      - run: goveralls -coverprofile=coverage.out -service=circle-ci -repotoken=$COVERALLS_TOKEN
+   test:
+    docker:
+       - image: circleci/golang:1.13
+         environment:
+           - GO111MODULE=on
+           - GOLANG_LINT_VERSION=v1.27.0
+           - COVERALLS_TOKEN=bO2QMP83jVaKiAOxWnsLZw2Wcp07cV99Q
+    working_directory: /go/src/github.com/kiegroup/kogito-cloud-operator
+    steps:
+      - checkout
+      - run: go get golang.org/x/tools/cmd/cover
+      - run: go get github.com/mattn/goveralls
+      - run: go test ./cmd/... -p=1 -coverprofile=coverage.out
+      - run: goveralls -coverprofile=coverage.out -service=circle-ci -repotoken=$COVERALLS_TOKEN
+
+workflows:
+      version: 2
+      build_and_test:
+        jobs:
+          - build
+          - test
