@@ -22,7 +22,7 @@ jobs:
       - run: go vet ./...
       - run: golangci-lint run ./...
       - run: ./hack/go-lint.sh
-      - run: go test ./pkg/...  -p=1  -coverprofile=coverage.out
+      - run: go test ./...  -p=1  -coverprofile=coverage.out
       - run: goveralls -coverprofile=coverage.out -service=circle-ci -repotoken=$COVERALLS_TOKEN
    test:
     docker:
