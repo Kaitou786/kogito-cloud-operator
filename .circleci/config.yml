@@ -1,7 +1,9 @@
 # Golang CircleCI 2.0 configuration file
 #
 # Check https://circleci.com/docs/2.0/language-go/ for more details
-version: 2
+version: 2.1
+orbs:
+  kube-orb: circleci/kubernetes@0.11.0
 jobs:
   lint:
     docker:
@@ -16,6 +18,7 @@ jobs:
       - run:
           name: Install operator-sdk
           command: |
+            exit 1
             sudo curl -L https://github.com/operator-framework/operator-sdk/releases/download/$OPERATOR_SDK_VERSION/operator-sdk-$OPERATOR_SDK_VERSION-x86_64-linux-gnu -o /usr/bin/operator-sdk
             sudo chmod +x /usr/bin/operator-sdk
             # For debugging
@@ -74,11 +77,43 @@ jobs:
       - run: git clone https://github.com/bats-core/bats-core.git
       - run: cd bats-core && ./install.sh $HOME
       - run: $HOME/bin/bats hack/*.bats
+
+  olm_integration_test:
+    docker:
+      - image: circleci/golang:1.14
+    working_directory: /go/src/github.com/kiegroup/kogito-cloud-operator
+    steps:
+      - checkout
+      - setup_remote_docker
+      - kube-orb/install-kubectl
+      - run: docker images
+      - run:
+          name: Install operator-sdk
+          command: ./hack/ci/install-operator-sdk.sh
+      - run:
+          name: Install kind
+          command: ./hack/ci/install-kind.sh
+      - run:
+          name: Start Kind
+          command: ./hack/ci/start-kind.sh
+      - run:
+          name: Generate Manifests
+          command: ./hack/generate-manifests.sh
+      - run:
+          name: Build Operator Image
+          command: ./hack/go-build.sh
+      - run:
+          name: Load Operator Image
+          command: ./hack/ci/load-operator-image.sh
+      - run:
+          name: Run Operator OLM Integration Test
+          command: ./hack/ci/operator-olm-test.sh
 workflows:
   version: 2
   pr_check:
     jobs:
       - lint
+      - olm_integration_test
       - unit_test_and_coverage:
           requires:
             - lint

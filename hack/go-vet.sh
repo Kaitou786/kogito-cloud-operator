@@ -26,6 +26,6 @@ echo "Generating openapi files"
 ./bin/openapi-gen --logtostderr=true -o "" -i github.com/kiegroup/kogito-cloud-operator/pkg/apis/app/v1alpha1 -O zz_generated.openapi -p ./pkg/apis/app/v1alpha1 -h ./hack/boilerplate.go.txt -r "-"
 ./bin/openapi-gen --logtostderr=true -o "" -i github.com/kiegroup/kogito-cloud-operator/pkg/apis/kafka/v1beta1 -O zz_generated.openapi -p ./pkg/apis/kafka/v1beta1 -h ./hack/boilerplate.go.txt -r "-"
 
-operator-sdk generate csv --csv-version 0.12.0 --update-crds --operator-name kogito-operator
+./hack/generate-manifests.sh
 
 go vet ./...
