@@ -26,6 +26,8 @@ mkdir -p "${OUTPUT}"
 
 cp -r "deploy/olm-catalog/kogito-operator/" "${OUTPUT}"
 rm -rf "${OUTPUT}/kogito-operator/manifests"
+rm -f "${OUTPUT}/kogito-operator/custom-subscription-example.yaml"
+rm -f "${OUTPUT}/kogito-operator/kogito-operator-operatorsource.yaml"
 
 echo "---> Manifest files in the output directory for OLM verification"
 ls -l "${OUTPUT}/kogito-operator"
