@@ -22,11 +22,10 @@ echo "---> Output dir is set to ${OUTPUT}"
 # clean up
 rm -rf "${OUTPUT}"
 
-mkdir -p "${OUTPUT}/kogito-operator"
+mkdir -p "${OUTPUT}"
 
-cp -r "deploy/olm-catalog/kogito-operator/${OP_VERSION}/" "${OUTPUT}/kogito-operator/"
-cp -r "deploy/olm-catalog/kogito-operator/0.9.1/" "${OUTPUT}/kogito-operator/"
-cp "deploy/olm-catalog/kogito-operator/"*.yaml "${OUTPUT}/kogito-operator/"
+cp -r "deploy/olm-catalog/kogito-operator/" "${OUTPUT}"
+rm -rf "${OUTPUT}/kogito-operator/manifests"
 
 echo "---> Manifest files in the output directory for OLM verification"
-tree "${OUTPUT}/"
+ls -l "${OUTPUT}/kogito-operator"

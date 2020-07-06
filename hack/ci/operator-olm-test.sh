@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+set -e
 source ./hack/ci/operator-ensure-manifests.sh
 source ./hack/export-version.sh
 
@@ -35,9 +35,8 @@ if [ -z ${KUBECONFIG} ]; then
 fi
 
 
-csv_file=${OUTPUT}/kogito-operator/${OP_VERSION}/kogito-operator.v${OP_VERSION}.clusterserviceversion.yaml
-echo "---> Updating CSV file '${csv_file}' to imagePullPolicy: Never"
-sed -i 's/imagePullPolicy: Always/imagePullPolicy: Never/g' ${csv_file}
+echo "---> Updating All CSV files to imagePullPolicy: Never"
+find "${OUTPUT}/kogito-operator/" -name '*.clusterserviceversion.yaml' -type f -print0 | xargs -0 sed -i 's/imagePullPolicy: Always/imagePullPolicy: Never/g'
 echo "---> Resulting imagePullPolicy on manifest files"
 grep -rn imagePullPolicy ${OUTPUT}/kogito-operator
 echo "---> Building temporary catalog Image"
