@@ -36,10 +36,8 @@ fi
 
 
 csv_file=${OUTPUT}/kogito-operator/${OP_VERSION}/kogito-operator.v${OP_VERSION}.clusterserviceversion.yaml
-csv_file_dev=${OUTPUT}/kogito-operator/0.9.0/kogito-operator.v0.9.0.clusterserviceversion.yaml
 echo "---> Updating CSV file '${csv_file}' to imagePullPolicy: Never"
 sed -i 's/imagePullPolicy: Always/imagePullPolicy: Never/g' ${csv_file}
-sed -i 's/imagePullPolicy: Always/imagePullPolicy: Never/g' ${csv_file_dev}
 echo "---> Resulting imagePullPolicy on manifest files"
 grep -rn imagePullPolicy ${OUTPUT}/kogito-operator
 echo "---> Building temporary catalog Image"
