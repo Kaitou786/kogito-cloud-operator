@@ -24,10 +24,17 @@ rm -rf "${OUTPUT}"
 
 mkdir -p "${OUTPUT}"
 
+rm -rf ~/operators/
+git clone https://github.com/operator-framework/community-operators.git ~/operators/
+cp -r ~/operators/community-operators/strimzi-kafka-operator "${OUTPUT}"
+cp -r ~/operators/community-operators/keycloak "${OUTPUT}"
+cp -r ~/operators/community-operators/infinispan/ "${OUTPUT}"
+rm -rf ~/operators/
+
 cp -r "deploy/olm-catalog/kogito-operator/" "${OUTPUT}"
 rm -rf "${OUTPUT}/kogito-operator/manifests"
 rm -f "${OUTPUT}/kogito-operator/custom-subscription-example.yaml"
 rm -f "${OUTPUT}/kogito-operator/kogito-operator-operatorsource.yaml"
 
 echo "---> Manifest files in the output directory for OLM verification"
-ls -l "${OUTPUT}/kogito-operator"
+ls -l "${OUTPUT}"
