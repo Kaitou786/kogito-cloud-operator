@@ -39,17 +39,11 @@ BRANCH=master
 REGISTRY=quay.io/kiegroup
 IMAGE=kogito-cloud-operator
 TAG=0.12.0
-TAR=${BRANCH}.tar.gz
-URL=${REPO}/archive/${TAR}
-CFLAGS="--redhat --build-tech-preview"
 BINARY_OUTPUT=build/_output/bin/kogito-cloud-operator
 
 setGoModEnv
 go generate ./...
 
-if [[ ! -z ${CUSTOM_BASE_IMAGE} ]]; then
-    sed -i -e 's,'"${DEFAULT_BASE_IMAGE}"','"${CUSTOM_BASE_IMAGE}"',' ./build/Dockerfile
-fi
 if [[ -z ${CUSTOM_IMAGE_TAG} ]]; then
     CUSTOM_IMAGE_TAG=${REGISTRY}/${IMAGE}:${TAG}
 fi
