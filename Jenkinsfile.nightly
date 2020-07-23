@@ -13,12 +13,7 @@ pipeline {
         timeout(time: 360, unit: 'MINUTES')
     }
 
-    environment {
-        WORKING_DIR = "/home/jenkins/go/src/github.com/kiegroup/kogito-cloud-operator/"
-        GOPATH = "/home/jenkins/go"
-        GOCACHE = "/home/jenkins/go/.cache/go-build"
-    }
-    
+   
     stages {
         stage('Clean Workspace') {
             steps {
