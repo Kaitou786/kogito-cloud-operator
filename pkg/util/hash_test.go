@@ -12,12 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package util
-
-import (
-	"github.com/stretchr/testify/assert"
-	"testing"
-)
 
 func TestGenerateMD5Hash(t *testing.T) {
 	map1 := map[string]string{"key": "value"}
