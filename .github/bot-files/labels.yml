@@ -1,0 +1,21 @@
+## used for defining the labels to put on PR on various events
+
+allLabels:
+  - paths:
+      - cmd/
+    label:
+      - cli
+  - paths:
+      - pkg/
+    label:
+      - operator
+  - paths:
+      - test/
+    label:
+      - bdd test
+  - paths:
+      - Jenkinsfile
+    label:
+      - CI/CD
+default:
+  - needs review
