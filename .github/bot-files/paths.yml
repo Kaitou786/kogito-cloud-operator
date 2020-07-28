@@ -7,6 +7,6 @@
 
 files:
   - Jenkinsfile
-  - test/
-  - cmd/
-  - pkg/
+  - test/**
+  - cmd/**
+  - pkg/**
