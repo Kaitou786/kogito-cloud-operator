@@ -14,11 +14,3 @@ coverage:
         target: auto
         base: auto
         threshold: 5%
-        flags:
-          - operator
-      cli:
-        target: auto
-        base: auto
-        threshold: 5%
-        flags:
-          - cli
