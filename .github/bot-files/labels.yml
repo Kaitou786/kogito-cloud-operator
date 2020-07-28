@@ -3,15 +3,15 @@
 
 allLabels:
   - paths:
-      - cmd/
+      - cmd/**
     label:
       - cli
   - paths:
-      - pkg/
+      - pkg/**
     label:
       - operator
   - paths:
-      - test/
+      - test/**
     label:
       - bdd test
   - paths:
