@@ -5,13 +5,13 @@
 
 review:
   - paths:
-      - cmd/
-      - pkg/
+      - cmd/**
+      - pkg/**
     reviewers:
       - Kaitou786
       - Kevin-Mok
   - paths:
-      - test/
+      - test/**
     reviewers:
       - Kaitou786
   - paths:
