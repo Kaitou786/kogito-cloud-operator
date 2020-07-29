@@ -8,12 +8,7 @@
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-// Code from here has been copied and a bit rearranged from github.com/cucumber/godog/suite.go
-// as we needed the functionality to access features from the suite but it not possible
+t possible
 // Stay here as long as https://github.com/cucumber/godog/issues/222 is not solved
 
 package test
