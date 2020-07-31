@@ -1,22 +1,22 @@
 ---
 ## used for defining the labels to put on PR on various events
 
-allLabels:
+labels:
   - paths:
       - cmd/**
-    label:
+    labels:
       - cli
   - paths:
       - pkg/**
-    label:
+    labels:
       - operator
   - paths:
       - test/**
-    label:
+    labels:
       - bdd test
   - paths:
       - Jenkinsfile
-    label:
+    labels:
       - CI/CD
 default:
   - needs review
