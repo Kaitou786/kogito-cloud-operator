@@ -19,4 +19,4 @@ labels:
     labels:
       - CI/CD
 default:
-  - needs review
+  - 'needs review :mag:'
