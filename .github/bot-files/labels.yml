@@ -13,7 +13,7 @@ labels:
   - paths:
       - test/**
     labels:
-      - bdd test
+      - 'bdd-tests 🧪'
   - paths:
       - Jenkinsfile
     labels:
