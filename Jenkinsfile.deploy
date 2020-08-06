@@ -1,24 +1,4 @@
-@Library('jenkins-pipeline-shared-libraries')_
-
-pipeline {
-    agent {
-        label 'kogito-operator-slave && !master'
-    }
-
-    // Needed for local build
-    tools {
-        jdk 'kie-jdk11'
-    }
-
-    parameters {
-        string(name: 'DISPLAY_NAME', defaultValue: '', description: 'Setup a specific build display name')
-        
-        string(name: 'BUILD_BRANCH_NAME', defaultValue: 'master', description: 'Which branch to build ? Set if you are not on a multibranch pipeline.')
-        string(name: 'GIT_AUTHOR', defaultValue: 'kiegroup', description: 'Which Git author repository ?')
-
-        booleanParam(name: 'IMAGE_USE_OPENSHIFT_REGISTRY', defaultValue: false, description: 'Set to true if image should be deployed in Openshift registry.In this case, IMAGE_REGISTRY_CREDENTIALS, IMAGE_REGISTRY and IMAGE_NAMESPACE parameters will be ignored')
-        string(name: 'IMAGE_REGISTRY_CREDENTIALS', defaultValue: '', description: 'Image registry credentials to use to deploy images. Will be ignored if no IMAGE_REGISTRY is given')
-        string(name: 'IMAGE_REGISTRY', defaultValue: '', description: 'Image registry to use to deploy images')
+Value: '', description: 'Image registry to use to deploy images')
         string(name: 'IMAGE_NAMESPACE', defaultValue: 'kiegroup', description: 'Image namespace to use to deploy images')
         string(name: 'IMAGE_NAME_SUFFIX', defaultValue: '', description: 'Image name suffix to use to deploy images. In case you need to change the final image name, you can add a suffix to it.')
         string(name: 'IMAGE_TAG', defaultValue: '', description: 'Image tag to use to deploy images')
