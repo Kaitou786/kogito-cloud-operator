@@ -1,20 +1,4 @@
-@Library('jenkins-pipeline-shared-libraries')_
-
-def changeAuthor = env.ghprbPullAuthorLogin ?: CHANGE_AUTHOR
-def changeBranch = env.ghprbSourceBranch ?: CHANGE_BRANCH
-def changeTarget = env.ghprbTargetBranch ?: CHANGE_TARGET
-
-pipeline {
-    agent { label 'operator-slave'}
-    options {
-        buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10')
-        timeout(time: 90, unit: 'MINUTES')
-    }
-    stages {
-        stage('Initialize') {
-            steps {
-               script{
-                    sh ' git config --global user.email "jenkins@kie.com" '
+.email "jenkins@kie.com" '
                     sh ' git config --global user.name "kie user"'
                     githubscm.checkoutIfExists('kogito-cloud-operator', changeAuthor, changeBranch, 'kiegroup', changeTarget, true, ['token' : 'GITHUB_TOKEN', 'usernamePassword' : 'user-kie-ci10'])
                     sh "set +x && oc login --token=\$(oc whoami -t) --server=${OPENSHIFT_API} --insecure-skip-tls-verify"
