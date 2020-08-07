@@ -13,14 +13,7 @@
 // limitations under the License.
 
 package infrastructure
-
-import (
-	"fmt"
-	"net/url"
-
-	"github.com/kiegroup/kogito-cloud-operator/pkg/apis/app/v1alpha1"
-	"github.com/kiegroup/kogito-cloud-operator/pkg/client"
-	"github.com/kiegroup/kogito-cloud-operator/pkg/client/kubernetes"
+t/kubernetes"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/framework"
 )
 
