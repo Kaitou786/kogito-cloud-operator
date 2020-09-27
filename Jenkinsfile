@@ -30,9 +30,6 @@ pipeline {
         stage('Build Kogito Operator') {
             steps {
                 sh """
-                    go get -u golang.org/x/lint/golint
-                    usermod --add-subuids 10000-75535 \$(whoami)
-                    usermod --add-subgids 10000-75535 \$(whoami)
                     make image_builder=${CONTAINER_ENGINE}
                 """
             }
