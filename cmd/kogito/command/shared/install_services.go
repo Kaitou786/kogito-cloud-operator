@@ -54,7 +54,7 @@ type ServicesInstallation interface {
 	// Depends on the Operator, install it first.
 	InstallInfraService(infra *v1beta1.KogitoInfra) ServicesInstallation
 	// InstallOperator installs the Operator.
-	InstallOperator(warnIfInstalled bool, operatorImage string, force bool, ch KogitoChannelType) ServicesInstallation
+	InstallOperator(warnIfInstalled bool, operatorImage string, force bool, ch KogitoChannelType, clusterScope bool) ServicesInstallation
 	// SilentlyInstallOperatorIfNotExists installs the operator without a warn if already deployed with the default image
 	SilentlyInstallOperatorIfNotExists(ch KogitoChannelType) ServicesInstallation
 	// GetError return any given error during the installation process
@@ -171,15 +171,15 @@ func (s *servicesInstallation) InstallInfraService(infra *v1beta1.KogitoInfra) S
 	return s
 }
 
-func (s *servicesInstallation) InstallOperator(warnIfInstalled bool, operatorImage string, force bool, ch KogitoChannelType) ServicesInstallation {
+func (s *servicesInstallation) InstallOperator(warnIfInstalled bool, operatorImage string, force bool, ch KogitoChannelType, clusterScope bool) ServicesInstallation {
 	if s.err == nil && !s.operatorInstalled {
-		s.operatorInstalled, s.err = InstallOperatorIfNotExists(s.namespace, operatorImage, s.client, warnIfInstalled, force, ch)
+		s.operatorInstalled, s.err = InstallOperatorIfNotExists(s.namespace, operatorImage, s.client, warnIfInstalled, force, ch, clusterScope)
 	}
 	return s
 }
 
 func (s servicesInstallation) SilentlyInstallOperatorIfNotExists(ch KogitoChannelType) ServicesInstallation {
-	return s.InstallOperator(false, "", false, ch)
+	return s.InstallOperator(false, "", false, ch, true)
 }
 
 func (s *servicesInstallation) GetError() error {

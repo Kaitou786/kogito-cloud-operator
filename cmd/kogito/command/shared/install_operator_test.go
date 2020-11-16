@@ -21,10 +21,10 @@ import (
 	"github.com/kiegroup/kogito-cloud-operator/pkg/operator"
 	olmapiv1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/apis/operators/v1"
 	"github.com/operator-framework/operator-lifecycle-manager/pkg/api/apis/operators/v1alpha1"
+	operators "github.com/operator-framework/operator-lifecycle-manager/pkg/package-server/apis/operators/v1"
 
 	"github.com/stretchr/testify/assert"
 
-	operatormkt "github.com/operator-framework/operator-marketplace/pkg/apis/operators/v1"
 	apps "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	apiextensionsv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
@@ -88,19 +88,16 @@ func Test_InstallOperatorWithYaml(t *testing.T) {
 }
 
 func TestMustInstallOperatorIfNotExists_WithOperatorHub(t *testing.T) {
-	ns := operatorMarketplaceNamespace
-	operatorSource := &operatormkt.OperatorSource{
+	ns := operatorOpenshiftMarketplaceNamespace
+	packageManifest := &operators.PackageManifest{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      communityOperatorSource,
-			Namespace: operatorMarketplaceNamespace,
-		},
-		Status: operatormkt.OperatorSourceStatus{
-			Packages: "cert-utils-operator,spark-gcp,metering,spinnaker-operator,apicurito,kubefed,prometheus,hawtio-operator,t8c,hazelcast-enterprise,opsmx-spinnaker-operator,ibmcloud-operator,openebs,iot-simulator,submariner,microcks,enmasse,teiid,federation,aqua,eclipse-che,3scale-community-operator,jaeger,openshift-pipelines-operator,awss3-operator-registry,service-binding-operator,node-network-operator,myvirtualdirectory,triggermesh,namespace-configuration-operator,maistraoperator,camel-k,federatorai,knative-serving-operator,syndesis,knative-kafka-operator,postgresql,event-streams-topic,planetscale,kiali,ripsaw,esindex-operator,halkyon,quay,kogito-operator,seldon-operator,cockroachdb,atlasmap-operator,strimzi-kafka-operator,knative-camel-operator,lightbend-console-operator,descheduler,node-problem-detector,opendatahub-operator,radanalytics-spark,hco-operatorhub,smartgateway-operator,etcd,knative-eventing-operator,postgresql-operator-dev4devs-com,twistlock,microsegmentation-operator,open-liberty,akka-cluster-operator,grafana-operator,kubeturbo,appsody-community-operator,infinispan",
+			Name:      defaultOperatorPackageName,
+			Namespace: ns,
 		},
 	}
-	client := test.SetupFakeKubeCli(&v1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: ns}}, operatorSource)
+	client := test.SetupFakeKubeCli(&v1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: ns}}, packageManifest)
 	// Operator is there in the hub and not exists in the given namespace, let's check if there's no error
-	installed, err := InstallOperatorIfNotExists(ns, defaultOperatorImageName, client, false, false, GetDefaultChannel())
+	installed, err := InstallOperatorIfNotExists(ns, defaultOperatorImageName, client, false, false, GetDefaultChannel(), false)
 	assert.NoError(t, err)
 	assert.True(t, installed)
 
@@ -120,10 +117,10 @@ func TestMustInstallOperatorIfNotExists_WithoutOperatorHub(t *testing.T) {
 
 	client := test.SetupFakeKubeCli(
 		&v1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: ns}},
-		&v1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: operatorMarketplaceNamespace}},
+		&v1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: operatorOpenshiftMarketplaceNamespace}},
 	)
 	// Operator is not in the hub. Install with yaml files.
-	installed, err := InstallOperatorIfNotExists(ns, defaultOperatorImageName, client, false, false, GetDefaultChannel())
+	installed, err := InstallOperatorIfNotExists(ns, defaultOperatorImageName, client, false, false, GetDefaultChannel(), false)
 	assert.NoError(t, err)
 	assert.True(t, installed)
 	// Operator is now in the hub, but no pods are running because this is a controlled test environment

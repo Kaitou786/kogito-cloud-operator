@@ -95,13 +95,16 @@ func DeployKogitoOperatorFromYaml(namespace string) error {
 	GetLogger(namespace).Infof("Deploy Operator from yaml files in %s", deployURI)
 
 	// TODO: error handling, go lint is screaming about this
+	if err := loadResource(namespace, deployURI+"namespace.yaml", &corev1.Namespace{}, nil); err != nil {
+		return err
+	}
 	if err := loadResource(namespace, deployURI+"service_account.yaml", &corev1.ServiceAccount{}, nil); err != nil {
 		return err
 	}
-	if err := loadResource(namespace, deployURI+"role.yaml", &rbac.Role{}, nil); err != nil {
+	if err := loadResource(namespace, deployURI+"clusterrole.yaml", &rbac.ClusterRole{}, nil); err != nil {
 		return err
 	}
-	if err := loadResource(namespace, deployURI+"role_binding.yaml", &rbac.RoleBinding{}, nil); err != nil {
+	if err := loadResource(namespace, deployURI+"clusterrole_binding.yaml", &rbac.ClusterRoleBinding{}, nil); err != nil {
 		return err
 	}
 

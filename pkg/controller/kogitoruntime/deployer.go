@@ -36,8 +36,6 @@ import (
 )
 
 const (
-	serviceAccountName = "kogito-service-viewer"
-
 	envVarExternalURL = "KOGITO_SERVICE_URL"
 
 	// protobufConfigMapSuffix Suffix that is appended to Protobuf ConfigMap name
@@ -142,6 +140,18 @@ func onDeploymentCreate(cli *client.Client, deployment *v1.Deployment, kogitoSer
 	// external URL
 	if kogitoService.GetStatus().GetExternalURI() != "" {
 		framework.SetEnvVar(envVarExternalURL, kogitoService.GetStatus().GetExternalURI(), &deployment.Spec.Template.Spec.Containers[0])
+	}
+	// create sa
+	if err := createServiceAccountIfNotExists(cli, kogitoService.GetNamespace()); err != nil {
+		return fmt.Errorf("error creating Service Account: %v", err)
+	}
+	// create role
+	if err := createRoleIfNotExists(cli, kogitoService.GetNamespace()); err != nil {
+		return fmt.Errorf("error creating role: %v", err)
+	}
+	//create rolebinding
+	if err := createRoleBindingIfNotExists(cli, kogitoService.GetNamespace()); err != nil {
+		return fmt.Errorf("error creating rolebinding: %v", err)
 	}
 	// sa
 	deployment.Spec.Template.Spec.ServiceAccountName = serviceAccountName

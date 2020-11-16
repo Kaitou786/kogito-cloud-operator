@@ -46,7 +46,6 @@ For a more customized Jobs Service installation, use 'kogito install jobs-servic
 	// InstallMgmtConsole --install-mgmt-console
 	InstallMgmtConsole = `Installs the default instance of Jobs Service being provisioned by the Kogito Operator in the project.
 For a more customized Jobs Service installation, use 'kogito install jobs-service [OPTIONS]'`
-	// InstallAllServices --install-all
-	InstallAllServices = `Installs the default instance of all Kogito Support Services being provisioned by the Kogito Operator in the project.
-Avoid installing the default services on production environments. Prefer the command 'kogito install [SERVICE]' since it can be customized.`
+	// ClusterScope --cluster-scope
+	ClusterScope = `Installs the operator in cluster scope. Defaults to true`
 )

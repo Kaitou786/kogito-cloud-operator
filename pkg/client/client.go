@@ -16,6 +16,7 @@ package client
 
 import (
 	"fmt"
+	rbac "k8s.io/api/rbac/v1"
 	"os"
 	"path/filepath"
 	"strings"
@@ -200,7 +201,9 @@ func newControllerCliOptions() controllercli.Options {
 	for _, gvk := range gvks {
 		// namespaced resources
 		if (gvk.GroupVersion() == corev1.SchemeGroupVersion && gvk.Kind == "Namespace") ||
-			(gvk.GroupVersion() == apiextensionsv1beta1.SchemeGroupVersion && gvk.Kind == "CustomResourceDefinition") {
+			(gvk.GroupVersion() == apiextensionsv1beta1.SchemeGroupVersion && gvk.Kind == "CustomResourceDefinition") ||
+			(gvk.GroupVersion() == rbac.SchemeGroupVersion && gvk.Kind == "ClusterRole") ||
+			(gvk.GroupVersion() == rbac.SchemeGroupVersion && gvk.Kind == "ClusterRoleBinding") {
 			mapper.Add(gvk, &restScope{name: apimeta.RESTScopeNameRoot})
 		} else { // everything else
 			mapper.Add(gvk, &restScope{name: apimeta.RESTScopeNameNamespace})
