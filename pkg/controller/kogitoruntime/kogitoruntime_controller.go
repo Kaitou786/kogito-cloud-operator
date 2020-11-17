@@ -107,7 +107,6 @@ func (r *ReconcileKogitoRuntime) Reconcile(request reconcile.Request) (result re
 		return
 	}
 
-
 	if err = setupRBAC(request.Namespace, r.client); err != nil {
 		return
 	}

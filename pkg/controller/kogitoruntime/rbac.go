@@ -39,7 +39,6 @@ func getServiceViewerServiceAccount(namespace string) meta.ResourceObject {
 	}
 }
 
-
 func getServiceViewerRole(namespace string) meta.ResourceObject {
 	return &rbac.Role{
 		ObjectMeta: v12.ObjectMeta{
