@@ -107,6 +107,11 @@ func (r *ReconcileKogitoRuntime) Reconcile(request reconcile.Request) (result re
 		return
 	}
 
+
+	if err = setupRBAC(request.Namespace, r.client); err != nil {
+		return
+	}
+
 	if err = infrastructure.MountProtoBufConfigMapOnDataIndex(r.client, instance); err != nil {
 		log.Errorf("Fail to mount Proto Buf config map of Kogito runtime service(%s) on DataIndex", instance.Name, err)
 		return

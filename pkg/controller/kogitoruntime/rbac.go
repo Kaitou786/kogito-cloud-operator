@@ -17,6 +17,7 @@ package kogitoruntime
 import (
 	"github.com/kiegroup/kogito-cloud-operator/pkg/client"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/client/kubernetes"
+	"github.com/kiegroup/kogito-cloud-operator/pkg/client/meta"
 	v1 "k8s.io/api/core/v1"
 	rbac "k8s.io/api/rbac/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -29,20 +30,18 @@ const (
 	roleAPIGroup       = "rbac.authorization.k8s.io"
 )
 
-func createServiceAccountIfNotExists(client *client.Client, namespace string) (err error) {
-	if err = kubernetes.ResourceC(client).CreateIfNotExists(&v1.ServiceAccount{
+func getServiceViewerServiceAccount(namespace string) meta.ResourceObject {
+	return &v1.ServiceAccount{
 		ObjectMeta: v12.ObjectMeta{
 			Name:      serviceAccountName,
 			Namespace: namespace,
 		},
-	}); err != nil {
-		return
 	}
-	return nil
 }
 
-func createRoleIfNotExists(client *client.Client, namespace string) (err error) {
-	if err = kubernetes.ResourceC(client).CreateIfNotExists(&rbac.Role{
+
+func getServiceViewerRole(namespace string) meta.ResourceObject {
+	return &rbac.Role{
 		ObjectMeta: v12.ObjectMeta{
 			Name:      roleName,
 			Namespace: namespace,
@@ -54,14 +53,10 @@ func createRoleIfNotExists(client *client.Client, namespace string) (err error) 
 				Resources: []string{"services", "configmaps"},
 			},
 		},
-	}); err != nil {
-		return
 	}
-	return nil
 }
-
-func createRoleBindingIfNotExists(client *client.Client, namespace string) (err error) {
-	if err = kubernetes.ResourceC(client).CreateIfNotExists(&rbac.RoleBinding{
+func getServiceViewerRoleBinding(namespace string) meta.ResourceObject {
+	return &rbac.RoleBinding{
 		ObjectMeta: v12.ObjectMeta{
 			Name:      roleBindingName,
 			Namespace: namespace,
@@ -77,8 +72,34 @@ func createRoleBindingIfNotExists(client *client.Client, namespace string) (err 
 			Name:     roleName,
 			Kind:     "Role",
 		},
-	}); err != nil {
-		return
+	}
+}
+
+func createServiceViewerRoleIfNotExists(namespace string, client *client.Client) error {
+	role := getServiceViewerRole(namespace)
+	return kubernetes.ResourceC(client).CreateIfNotExists(role)
+}
+
+func createServiceViewerRoleBindingIfNotExists(namespace string, client *client.Client) error {
+	rolebinding := getServiceViewerRoleBinding(namespace)
+	return kubernetes.ResourceC(client).CreateIfNotExists(rolebinding)
+}
+
+func createServiceViewerServiceAccountIfNotExists(namespace string, client *client.Client) error {
+	serviceAccount := getServiceViewerServiceAccount(namespace)
+	return kubernetes.ResourceC(client).CreateIfNotExists(serviceAccount)
+}
+
+func setupRBAC(namespace string, client *client.Client) error {
+	if err := createServiceViewerRoleIfNotExists(namespace, client); err != nil {
+		return err
+	}
+	if err := createServiceViewerRoleBindingIfNotExists(namespace, client); err != nil {
+		return err
+	}
+	if err := createServiceViewerServiceAccountIfNotExists(namespace, client); err != nil {
+		return err
 	}
 	return nil
+
 }
