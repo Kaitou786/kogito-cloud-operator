@@ -2119,7 +2119,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: kogito-operator
-    namespace: operators
+    namespace: kogito-operator-system
 roleRef:
   kind: ClusterRole
   name: kogito-operator
