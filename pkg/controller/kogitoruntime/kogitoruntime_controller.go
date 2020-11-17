@@ -108,21 +108,7 @@ func (r *ReconcileKogitoRuntime) Reconcile(request reconcile.Request) (result re
 		return
 	}
 
-	// create service viewer role
-	if err = kubernetes.ResourceC(r.client).CreateIfNotExists(getServiceViewerRole(request.Namespace)); err != nil {
-		log.Errorf("Fail to create role for service viewer: %v", err)
-		return
-	}
-
-	// create service viewer service account
-	if err = kubernetes.ResourceC(r.client).CreateIfNotExists(getServiceViewerServiceAccount(request.Namespace)); err != nil {
-		log.Errorf("Fail to create service account for service viewer: %v", err)
-		return
-	}
-
-	// create service viewer rolebinding
-	if err = kubernetes.ResourceC(r.client).CreateIfNotExists(getServiceViewerRoleBinding(request.Namespace)); err != nil {
-		log.Errorf("Fail to create role binding for service viewer: %v", err)
+	if err = r.setupRBAC(request.Namespace); err != nil {
 		return
 	}
 
@@ -148,6 +134,27 @@ func (r *ReconcileKogitoRuntime) Reconcile(request reconcile.Request) (result re
 		log.Infof("Waiting for all resources to be created, scheduling for 30 seconds from now")
 		result.RequeueAfter = requeueAfter
 		result.Requeue = true
+	}
+	return
+}
+
+func (r *ReconcileKogitoRuntime) setupRBAC(namespace string) (err error) {
+	// create service viewer role
+	if err = kubernetes.ResourceC(r.client).CreateIfNotExists(getServiceViewerRole(namespace)); err != nil {
+		log.Errorf("Fail to create role for service viewer: %v", err)
+		return
+	}
+
+	// create service viewer service account
+	if err = kubernetes.ResourceC(r.client).CreateIfNotExists(getServiceViewerServiceAccount(namespace)); err != nil {
+		log.Errorf("Fail to create service account for service viewer: %v", err)
+		return
+	}
+
+	// create service viewer rolebinding
+	if err = kubernetes.ResourceC(r.client).CreateIfNotExists(getServiceViewerRoleBinding(namespace)); err != nil {
+		log.Errorf("Fail to create role binding for service viewer: %v", err)
+		return
 	}
 	return
 }
