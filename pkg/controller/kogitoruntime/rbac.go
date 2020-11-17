@@ -15,8 +15,6 @@
 package kogitoruntime
 
 import (
-	"github.com/kiegroup/kogito-cloud-operator/pkg/client"
-	"github.com/kiegroup/kogito-cloud-operator/pkg/client/kubernetes"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/client/meta"
 	v1 "k8s.io/api/core/v1"
 	rbac "k8s.io/api/rbac/v1"
@@ -29,6 +27,10 @@ const (
 	roleBindingName    = "kogito-service-viewer"
 	roleAPIGroup       = "rbac.authorization.k8s.io"
 )
+
+var serviceViewerRoleVerbs = []string{"list", "get", "watch", "update", "patch"}
+var serviceViewerRoleAPIGroups = []string{""}
+var serviceViewerRoleResources = []string{"services", "configmaps"}
 
 func getServiceViewerServiceAccount(namespace string) meta.ResourceObject {
 	return &v1.ServiceAccount{
@@ -47,9 +49,9 @@ func getServiceViewerRole(namespace string) meta.ResourceObject {
 		},
 		Rules: []rbac.PolicyRule{
 			{
-				Verbs:     []string{"list", "get", "watch", "update", "patch"},
-				APIGroups: []string{""},
-				Resources: []string{"services", "configmaps"},
+				Verbs:     serviceViewerRoleVerbs,
+				APIGroups: serviceViewerRoleAPIGroups,
+				Resources: serviceViewerRoleResources,
 			},
 		},
 	}
@@ -72,33 +74,4 @@ func getServiceViewerRoleBinding(namespace string) meta.ResourceObject {
 			Kind:     "Role",
 		},
 	}
-}
-
-func createServiceViewerRoleIfNotExists(namespace string, client *client.Client) error {
-	role := getServiceViewerRole(namespace)
-	return kubernetes.ResourceC(client).CreateIfNotExists(role)
-}
-
-func createServiceViewerRoleBindingIfNotExists(namespace string, client *client.Client) error {
-	rolebinding := getServiceViewerRoleBinding(namespace)
-	return kubernetes.ResourceC(client).CreateIfNotExists(rolebinding)
-}
-
-func createServiceViewerServiceAccountIfNotExists(namespace string, client *client.Client) error {
-	serviceAccount := getServiceViewerServiceAccount(namespace)
-	return kubernetes.ResourceC(client).CreateIfNotExists(serviceAccount)
-}
-
-func setupRBAC(namespace string, client *client.Client) error {
-	if err := createServiceViewerRoleIfNotExists(namespace, client); err != nil {
-		return err
-	}
-	if err := createServiceViewerRoleBindingIfNotExists(namespace, client); err != nil {
-		return err
-	}
-	if err := createServiceViewerServiceAccountIfNotExists(namespace, client); err != nil {
-		return err
-	}
-	return nil
-
 }

@@ -48,6 +48,7 @@ const (
 	skipOperatorInstallEnv            = "SKIP_OPERATOR"
 	openshiftGlobalOperatorNamespace  = "openshift-operators"
 	kubernetesGlobalOperatorNamespace = "operators"
+	operatorNamespace                 = "kogito-operator-system"
 )
 
 var (
@@ -70,10 +71,12 @@ func InstallOperatorIfNotExists(namespace string, operatorImage string, cli *cli
 	}
 
 	if clusterScope {
-		if cli.IsOpenshift() {
+		if cli.IsOpenshift() && cli.IsOLMAvaialable() {
 			namespace = openshiftGlobalOperatorNamespace
-		} else {
+		} else if cli.IsOLMAvaialable() {
 			namespace = kubernetesGlobalOperatorNamespace
+		} else {
+			namespace = operatorNamespace
 		}
 	}
 

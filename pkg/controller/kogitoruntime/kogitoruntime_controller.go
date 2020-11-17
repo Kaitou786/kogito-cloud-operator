@@ -17,6 +17,7 @@ package kogitoruntime
 import (
 	"github.com/kiegroup/kogito-cloud-operator/pkg/apis/app/v1beta1"
 	kogitocli "github.com/kiegroup/kogito-cloud-operator/pkg/client"
+	"github.com/kiegroup/kogito-cloud-operator/pkg/client/kubernetes"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/framework"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/infrastructure"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/infrastructure/services"
@@ -107,7 +108,21 @@ func (r *ReconcileKogitoRuntime) Reconcile(request reconcile.Request) (result re
 		return
 	}
 
-	if err = setupRBAC(request.Namespace, r.client); err != nil {
+	// create service viewer role
+	if err = kubernetes.ResourceC(r.client).CreateIfNotExists(getServiceViewerRole(request.Namespace)); err != nil {
+		log.Errorf("Fail to create role for service viewer: %v", err)
+		return
+	}
+
+	// create service viewer service account
+	if err = kubernetes.ResourceC(r.client).CreateIfNotExists(getServiceViewerServiceAccount(request.Namespace)); err != nil {
+		log.Errorf("Fail to create service account for service viewer: %v", err)
+		return
+	}
+
+	// create service viewer rolebinding
+	if err = kubernetes.ResourceC(r.client).CreateIfNotExists(getServiceViewerRoleBinding(request.Namespace)); err != nil {
+		log.Errorf("Fail to create role binding for service viewer: %v", err)
 		return
 	}
 

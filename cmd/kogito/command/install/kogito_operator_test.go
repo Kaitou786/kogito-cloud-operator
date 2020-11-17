@@ -138,5 +138,5 @@ func Test_InstallOperatorWithInvalidChannel(t *testing.T) {
 
 const (
 	defaultOperatorPackageName = "kogito-operator"
-	globalOperatorNamespace    = "operators"
+	globalOperatorNamespace    = "kogito-operator-system"
 )
