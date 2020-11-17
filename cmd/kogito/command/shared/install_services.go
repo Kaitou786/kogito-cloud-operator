@@ -56,7 +56,7 @@ type ServicesInstallation interface {
 	// InstallOperator installs the Operator.
 	InstallOperator(warnIfInstalled bool, operatorImage string, force bool, ch KogitoChannelType, clusterScope bool) ServicesInstallation
 	// SilentlyInstallOperatorIfNotExists installs the operator without a warn if already deployed with the default image
-	SilentlyInstallOperatorIfNotExists(ch KogitoChannelType) ServicesInstallation
+	SilentlyInstallOperatorIfNotExists(ch KogitoChannelType, clusterScope bool) ServicesInstallation
 	// GetError return any given error during the installation process
 	GetError() error
 }
@@ -178,8 +178,8 @@ func (s *servicesInstallation) InstallOperator(warnIfInstalled bool, operatorIma
 	return s
 }
 
-func (s servicesInstallation) SilentlyInstallOperatorIfNotExists(ch KogitoChannelType) ServicesInstallation {
-	return s.InstallOperator(false, "", false, ch, true)
+func (s servicesInstallation) SilentlyInstallOperatorIfNotExists(ch KogitoChannelType, clusterScope bool) ServicesInstallation {
+	return s.InstallOperator(false, "", false, ch, clusterScope)
 }
 
 func (s *servicesInstallation) GetError() error {
