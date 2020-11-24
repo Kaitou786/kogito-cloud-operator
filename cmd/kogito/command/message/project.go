@@ -46,6 +46,6 @@ For a more customized Jobs Service installation, use 'kogito install jobs-servic
 	// InstallMgmtConsole --install-mgmt-console
 	InstallMgmtConsole = `Installs the default instance of Jobs Service being provisioned by the Kogito Operator in the project.
 For a more customized Jobs Service installation, use 'kogito install jobs-service [OPTIONS]'`
-	// ClusterScope --cluster-scope
-	ClusterScope = `Installs the operator in cluster scope. Defaults to true`
+	// Namespaced --namespaced
+	Namespaced = `Installs the operator in the target namespace. Defaults to false`
 )

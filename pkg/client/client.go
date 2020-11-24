@@ -16,6 +16,7 @@ package client
 
 import (
 	"fmt"
+	"github.com/kiegroup/kogito-cloud-operator/pkg/apis/app/v1beta1"
 	olmapiv1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/apis/operators/v1"
 	rbac "k8s.io/api/rbac/v1"
 	"os"
@@ -85,9 +86,14 @@ func (c *Client) IsOpenshift() bool {
 	return c.HasServerGroup(OpenShiftGroupName)
 }
 
-//IsOLMAvaialable detects if the cluster has OLM installed or not
+// IsOLMAvaialable detects if the cluster has OLM installed or not
 func (c *Client) IsOLMAvaialable() bool {
 	return c.HasServerGroup(olmapiv1.SchemeGroupVersion.Group)
+}
+
+// IsKogitoCRDsAvailable detects if the CRDs for kogito-operator are available or not
+func (c *Client) IsKogitoCRDsAvailable() bool {
+	return c.HasServerGroup(v1beta1.SchemeGroupVersion.Group)
 }
 
 // HasServerGroup detects if the given api group is supported by the server

@@ -59,18 +59,18 @@ var (
 // InstallOperatorIfNotExists installs the operator using the deploy/*yaml and deploy/crds/*crds.yaml files, if the operator deployment is not in the given namespace.
 // If the operator is available at the OperatorHub in OpenShift installations and not installed, tries to install the Operator via OLM Subscriptions.
 // operatorImage can be an empty string. In this case, the empty string is the default value.
-func InstallOperatorIfNotExists(namespace string, operatorImage string, cli *client.Client, warnIfInstalled bool, force bool, ch KogitoChannelType, clusterScope bool) (installed bool, err error) {
+func InstallOperatorIfNotExists(namespace string, operatorImage string, cli *client.Client, warnIfInstalled bool, force bool, ch KogitoChannelType, namespaced bool) (err error) {
 	log := context.GetDefaultLogger()
 	if util.GetBoolOSEnv(skipOperatorInstallEnv) {
 		log.Infof("%s environment variable set to true, skipping operator installation process", skipOperatorInstallEnv)
-		return true, nil
+		return nil
 	}
 
 	if len(operatorImage) == 0 {
 		operatorImage = DefaultOperatorImageNameTag
 	}
 
-	if clusterScope {
+	if !namespaced {
 		if cli.IsOpenshift() && cli.IsOLMAvaialable() {
 			namespace = openshiftGlobalOperatorNamespace
 		} else if cli.IsOLMAvaialable() {
@@ -81,22 +81,22 @@ func InstallOperatorIfNotExists(namespace string, operatorImage string, cli *cli
 	}
 
 	if exists, err := infrastructure.CheckKogitoOperatorExists(cli, namespace); err != nil {
-		return false, err
+		return err
 	} else if exists {
 		if warnIfInstalled {
 			log.Infof("Kogito Operator is already deployed in the namespace '%s', skipping ", namespace)
 		}
-		return true, nil
+		return nil
 	}
 
 	if available, err := isOperatorAvailableInOperatorHub(cli, namespace); err != nil {
 		log.Warnf("Couldn't find if the Kogito Operator is available in the cluster: %s ", err)
 	} else if available && !force {
-		if err := installOperatorWithOperatorHub(namespace, cli, ch, clusterScope); err != nil {
+		if err := installOperatorWithOperatorHub(namespace, cli, ch, namespaced); err != nil {
 			log.Warnf("Couldn't install Kogito Operator via OperatorHub: %s ", err)
-			return false, err
+			return err
 		}
-		return true, nil
+		return nil
 	}
 
 	if force {
@@ -106,12 +106,12 @@ func InstallOperatorIfNotExists(namespace string, operatorImage string, cli *cli
 	}
 
 	if err := installOperatorWithYamlFiles(operatorImage, namespace, cli); err != nil {
-		return false, fmt.Errorf("Error while deploying Kogito Operator via template yaml files: %s ", err)
+		return fmt.Errorf("Error while deploying Kogito Operator via template yaml files: %s ", err)
 	}
 
 	log.Infof("Kogito Operator successfully deployed in '%s' namespace", namespace)
 
-	return true, nil
+	return nil
 }
 
 // installOperatorWithYamlFiles installs the Kogito Operator in clusters that doesn't have OperatorHub installed, such as OCP 3.x and vanilla Kubernetes

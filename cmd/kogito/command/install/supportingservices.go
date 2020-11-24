@@ -223,7 +223,7 @@ func (i *installSupportingServiceCommand) Exec(cmd *cobra.Command, args []string
 
 	return shared.
 		ServicesInstallationBuilder(i.Client, i.flags.Project).
-		SilentlyInstallOperatorIfNotExists(shared.KogitoChannelType(i.flags.Channel), i.flags.ClusterScope).
+		CheckOperatorCRDs().
 		InstallSupportingService(supportingService).
 		GetError()
 }

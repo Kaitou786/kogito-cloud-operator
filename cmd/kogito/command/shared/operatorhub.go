@@ -64,11 +64,11 @@ func isOperatorAvailableInOperatorHub(kubeCli *client.Client, namespace string) 
 // installOperatorWithOperatorHub installs the Kogito Operator via OperatorHub custom resources, works for OCP 4.x
 // checks if a subscription to the given Kogito Operator package already exists. Doesn't create if one is in place.
 // see: https://docs.openshift.com/container-platform/4.2/operators/olm-adding-operators-to-cluster.html#olm-installing-operator-from-operatorhub-using-cli_olm-adding-operators-to-a-cluster
-func installOperatorWithOperatorHub(namespace string, cli *client.Client, channel KogitoChannelType, clusterScope bool) error {
+func installOperatorWithOperatorHub(namespace string, cli *client.Client, channel KogitoChannelType, namespaced bool) error {
 	log := context.GetDefaultLogger()
 	log.Debug("Trying to install Kogito Operator via Subscription to the OperatorHub")
 	// Global operator groups are present by default
-	if !clusterScope {
+	if namespaced {
 		if err := createOperatorGroupIfNotExists(namespace, cli); err != nil {
 			return err
 		}
