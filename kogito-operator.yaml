@@ -2129,7 +2129,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: kogito-operator
-  namespace: operators
+  namespace: kogito-operator-system
 spec:
   replicas: 1
   strategy:

@@ -46,7 +46,7 @@ oc apply -f deploy/clusterrole_binding.yaml
 # Operator
 sed "s/name: kogito-operator/name: $OPERATOR_NAME/g" deploy/operator.yaml > $TMP_FOLDER/operator.yaml
 sed "s|image: quay.io/kiegroup/.*|image: $IMAGE|g" $TMP_FOLDER/operator.yaml > $TMP_FOLDER/operator-tmp.yaml
-sed '4 a \ \ namespace: operators' $TMP_FOLDER/operator-tmp.yaml > $TMP_FOLDER/operator.yaml
+sed '4 a \ \ namespace: kogito-operator-system' $TMP_FOLDER/operator-tmp.yaml > $TMP_FOLDER/operator.yaml
 oc apply -f $TMP_FOLDER/operator.yaml
 
 # Clean Up

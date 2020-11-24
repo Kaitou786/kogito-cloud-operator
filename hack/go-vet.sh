@@ -29,7 +29,7 @@ declare rbac_files=("./deploy/clusterrole.yaml" "./deploy/service_account.yaml" 
 cat ./deploy/namespace.yaml > kogito-operator.yaml; printf "\n---\n" >> kogito-operator.yaml
 for yaml in deploy/crds/*_crd.yaml; do cat "${yaml}" >> kogito-operator.yaml; printf "\n---\n" >> kogito-operator.yaml; done
 for yaml in "${rbac_files[@]}"; do cat "${yaml}" >> kogito-operator.yaml; printf "\n---\n" >> kogito-operator.yaml; done
-sed '4 a \ \ namespace: operators' ./deploy/operator.yaml >> kogito-operator.yaml
+sed '4 a \ \ namespace: kogito-operator-system' ./deploy/operator.yaml >> kogito-operator.yaml
 
 # get the openapi binary
 command -v openapi-gen > /dev/null || go build -o "${GOPATH}"/bin/openapi-gen k8s.io/kube-openapi/cmd/openapi-gen
