@@ -101,14 +101,14 @@ func LoadGitFileIntoMemory(resource string) (io.Reader, string, error) {
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to download %s, error message: %s", resource, err.Error())
 	}
-	log.Infof(message.KogitoBuildFoundAsset, fileName)
+	log.Info(message.KogitoBuildFoundAsset, "Asset", fileName)
 	return response.Body, fileName, nil
 }
 
 // LoadLocalFileIntoMemory reads file from local system and load it in memory.
 func LoadLocalFileIntoMemory(resource string) (io.Reader, string, error) {
 	log := context.GetDefaultLogger()
-	log.Infof(message.KogitoBuildFoundFile, resource)
+	log.Info(message.KogitoBuildFoundFile, "File", resource)
 	ff := strings.Split(resource, "/")
 	fileName := strings.Join(strings.Fields(ff[len(ff)-1]), "")
 	fileReader, err := os.Open(resource)

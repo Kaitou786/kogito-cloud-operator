@@ -144,9 +144,9 @@ func CompressAsTGZ(resource string, binaryBuildType flag.BinaryBuildType) (io.Re
 	}
 
 	if err != nil {
-		log.Errorf(message.KogitoBuildFileWalkingError, resource, err)
+		log.Error(err, message.KogitoBuildFileWalkingError, "Directory", resource)
 	}
-	log.Infof(message.KogitoBuildFoundFile, filesFound)
+	log.Info(message.KogitoBuildFoundFile, "Files", filesFound)
 	return &buf, err
 }
 

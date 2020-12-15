@@ -15,13 +15,13 @@
 package service
 
 import (
+	"github.com/kiegroup/kogito-cloud-operator/api/v1beta1"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/context"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/converter"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/flag"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/message"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/shared"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/util"
-	"github.com/kiegroup/kogito-cloud-operator/pkg/apis/app/v1beta1"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/client"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/client/kubernetes"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/infrastructure"
@@ -48,7 +48,7 @@ func NewRuntimeService() RuntimeService {
 // InstallRuntimeService install Kogito runtime service
 func (i runtimeService) InstallRuntimeService(cli *client.Client, flags *flag.RuntimeFlags) (err error) {
 	log := context.GetDefaultLogger()
-	log.Debugf("Installing Kogito Runtime : %s", flags.Name)
+	log.Debug("Installing", "Kogito Runtime", flags.Name)
 	if err := i.resourceCheckService.CheckKogitoRuntimeNotExists(cli, flags.Name, flags.Project); err != nil {
 		return err
 	}
@@ -85,7 +85,7 @@ func (i runtimeService) InstallRuntimeService(cli *client.Client, flags *flag.Ru
 		},
 	}
 
-	log.Debugf("Trying to deploy Kogito Service '%s'", kogitoRuntime.Name)
+	log.Debug("Trying to deploy", "Kogito Service", kogitoRuntime.Name)
 	// Create the Kogito application
 	err = shared.
 		ServicesInstallationBuilder(cli, flags.Project).
@@ -110,7 +110,7 @@ func printMgmtConsoleInfo(client *client.Client, project string) error {
 	if endpoint == nil {
 		log.Info(message.RuntimeServiceMgmtConsole)
 	} else {
-		log.Infof(message.RuntimeServiceMgmtConsoleEndpoint, endpoint.HTTPRouteURI)
+		log.Info(message.RuntimeServiceMgmtConsoleEndpoint, "management console", endpoint.HTTPRouteURI)
 	}
 	return nil
 }
@@ -121,7 +121,7 @@ func (i runtimeService) DeleteRuntimeService(cli *client.Client, name, project s
 	if err := i.resourceCheckService.CheckKogitoRuntimeExists(cli, name, project); err != nil {
 		return err
 	}
-	log.Debugf("About to delete service %s in namespace %s", name, project)
+	log.Debug("About to delete", "service", name, "namespace", project)
 	if err := kubernetes.ResourceC(cli).Delete(&v1beta1.KogitoRuntime{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      name,
@@ -130,6 +130,6 @@ func (i runtimeService) DeleteRuntimeService(cli *client.Client, name, project s
 	}); err != nil {
 		return err
 	}
-	log.Infof("Successfully deleted Kogito Service %s in the Project %s", name, project)
+	log.Info("Successfully deleted", "Kogito Service", name, "project", project)
 	return nil
 }

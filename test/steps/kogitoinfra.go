@@ -16,36 +16,24 @@ package steps
 
 import (
 	"github.com/cucumber/godog"
-	"github.com/cucumber/messages-go/v10"
 	"github.com/kiegroup/kogito-cloud-operator/test/framework"
-	"github.com/kiegroup/kogito-cloud-operator/test/steps/mappers"
 )
 
-/*
-	DataTable for Kogito Infra:
-	| config          | <key>       | <value>      |
-*/
-
 func registerKogitoInfraSteps(ctx *godog.ScenarioContext, data *Data) {
-	ctx.Step(`^Install (Infinispan|MongoDB|Kafka|Keycloak) Kogito Infra "([^"]*)" within (\d+) (?:minute|minutes)$`, data.installKogitoInfraWithinMinutes)
-	ctx.Step(`^Install (Infinispan|MongoDB|Kafka|Keycloak) Kogito Infra "([^"]*)" within (\d+) (?:minute|minutes) with configuration:$`, data.installKogitoInfraWithinMinutesWithConfiguration)
+	ctx.Step(`^Install (Infinispan|Kafka|Keycloak) Kogito Infra "([^"]*)" within (\d+) (?:minute|minutes)$`, data.installKogitoInfraWithinMinutes)
+	ctx.Step(`^Install (Infinispan|Kafka|Keycloak) Kogito Infra "([^"]*)" connected to resource "([^"]*)" within (\d+) (?:minute|minutes)$`, data.installKogitoInfraConnectedToResourceWithinMinutes)
 }
 
 func (data *Data) installKogitoInfraWithinMinutes(targetResourceType, name string, timeoutInMin int) error {
-	return data.installKogitoInfraWithinMinutesWithConfiguration(targetResourceType, name, timeoutInMin, &messages.PickleStepArgument_PickleTable{})
+	return data.installKogitoInfraConnectedToResourceWithinMinutes(targetResourceType, name, "", timeoutInMin)
 }
 
-func (data *Data) installKogitoInfraWithinMinutesWithConfiguration(targetResourceType, name string, timeoutInMin int, table *godog.Table) error {
+func (data *Data) installKogitoInfraConnectedToResourceWithinMinutes(targetResourceType, name, resourcename string, timeoutInMin int) error {
 	infraResource, err := framework.GetKogitoInfraResourceStub(data.Namespace, name, targetResourceType)
 	if err != nil {
 		return err
 	}
-
-	if err := mappers.MapKogitoInfraTable(table, infraResource); err != nil {
-		return err
-	}
-
-	framework.GetLogger(data.Namespace).Debugf("Got kogitoInfra config %v", infraResource.Spec.InfraProperties)
+	infraResource.Spec.Resource.Name = resourcename
 
 	err = framework.InstallKogitoInfraComponent(data.Namespace, framework.GetDefaultInstallerType(), infraResource)
 	if err != nil {

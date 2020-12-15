@@ -17,9 +17,9 @@ package remove
 import (
 	"fmt"
 
+	"github.com/kiegroup/kogito-cloud-operator/api/v1beta1"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/context"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/shared"
-	"github.com/kiegroup/kogito-cloud-operator/pkg/apis/app/v1beta1"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/client/kubernetes"
 	"github.com/spf13/cobra"
 )
@@ -135,14 +135,14 @@ func (r *removeSupportingServiceCommand) Exec(cmd *cobra.Command, args []string)
 	}
 
 	if len(targetServiceItems) == 0 {
-		log.Warnf("There's no service %s in the namespace %s", r.supportingService.cmdName, r.flags.namespace)
+		log.Warn("There's no", "service", r.supportingService.cmdName, "namespace", r.flags.namespace)
 		return nil
 	}
 	for _, targetService := range targetServiceItems {
 		if err = kubernetes.ResourceC(r.Client).Delete(&targetService); err != nil {
 			return fmt.Errorf("error occurs while delete Service %s from namespace %s. Error %s", r.supportingService.cmdName, targetService.Name, err)
 		}
-		log.Infof("Service %s named %s from namespace %s has been successfully removed", r.supportingService.cmdName, targetService.Name, targetService.Namespace)
+		log.Info("Successfully removed", "service", targetService.Name, "service type", r.supportingService.cmdName, "namespace", targetService.Namespace)
 	}
 	return nil
 }

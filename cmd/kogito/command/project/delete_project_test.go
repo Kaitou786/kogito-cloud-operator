@@ -36,7 +36,7 @@ func Test_DeleteProjectCmd_WhenWeSuccessfullyDelete(t *testing.T) {
 		&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: ns}})
 	lines, _, err := test.ExecuteCli()
 	assert.NoError(t, err)
-	assert.Contains(t, lines, fmt.Sprintf("Successfully deleted Kogito Project %s", ns))
+	assert.Contains(t, lines, "Successfully deleted")
 }
 
 func Test_DeleteProjectCmd_WhenProjectDoesNotExist(t *testing.T) {

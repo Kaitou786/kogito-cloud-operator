@@ -106,7 +106,7 @@ func (c *controllerWatcher) Watch(watchedObjects ...WatchedObjects) (err error) 
 				c.groupsNotWatched[object.GroupVersion.Group] = true
 				// warn only for CRDs that are not in the OpenShift group
 				if !strings.Contains(object.GroupVersion.Group, client.OpenShiftGroupName) {
-					log.Warnf("Impossible to register GroupVersion %s. CRD not installed in the cluster, controller might not behave as expected", object.GroupVersion)
+					log.Warn("Impossible to register GroupVersion. CRD not installed in the cluster, controller might not behave as expected", "GroupVersion", object.GroupVersion)
 				}
 			}
 		}

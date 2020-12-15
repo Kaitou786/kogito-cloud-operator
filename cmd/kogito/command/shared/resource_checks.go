@@ -21,7 +21,7 @@ import (
 	"github.com/kiegroup/kogito-cloud-operator/pkg/client"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/infrastructure"
 
-	"github.com/kiegroup/kogito-cloud-operator/pkg/apis/app/v1beta1"
+	"github.com/kiegroup/kogito-cloud-operator/api/v1beta1"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/client/kubernetes"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -68,20 +68,20 @@ func EnsureProject(kubeCli *client.Client, project string) (string, error) {
 			return "", err
 		}
 	}
-	log.Debugf(message.ProjectUsingProject, project)
+	log.Debug(message.ProjectUsingProject, "Project", project)
 	return project, nil
 }
 
 // checkProjectExists ...
 func checkProjectExists(kubeCli *client.Client, namespace string) error {
 	log := context.GetDefaultLogger()
-	log.Debugf("Checking if namespace '%s' exists", namespace)
+	log.Debug("Checking if exists", "namespace", namespace)
 	if ns, err := kubernetes.NamespaceC(kubeCli).Fetch(namespace); err != nil {
 		return fmt.Errorf("Error while trying to fetch for the application context (namespace): %s ", err)
 	} else if ns == nil {
 		return fmt.Errorf("Project %s not found. Try setting your project using 'kogito use-project NAME' ", namespace)
 	}
-	log.Debugf("Namespace '%s' exists", namespace)
+	log.Debug("exists", "namespace", namespace)
 	return nil
 }
 
@@ -93,7 +93,7 @@ func (r resourceCheckServiceImpl) CheckKogitoRuntimeExists(kubeCli *client.Clien
 	} else if !exists {
 		return fmt.Errorf("Looks like a Kogito runtime with the name '%s' doesn't exist in this project. Please try another name ", name)
 	} else {
-		log.Debugf("Kogito runtime with name '%s' was found in the project '%s' ", name, namespace)
+		log.Debug("Found Kogito runtime with", "name", name, "in namspace", namespace)
 		return nil
 	}
 }
@@ -106,14 +106,14 @@ func (r resourceCheckServiceImpl) CheckKogitoRuntimeNotExists(kubeCli *client.Cl
 	} else if exists {
 		return fmt.Errorf("Looks like a Kogito Runtime with the name '%s' already exists in this context/namespace. Please try another name ", name)
 	} else {
-		log.Debugf("Custom resource with name '%s' was not found in the project '%s' ", name, namespace)
+		log.Debug("Custom Resource not found", "name", name, "namespace", namespace)
 		return nil
 	}
 }
 
 func isKogitoRuntimeExists(kubeCli *client.Client, name string, namespace string) (bool, error) {
 	log := context.GetDefaultLogger()
-	log.Debugf("Checking if Kogito Service '%s' was deployed before on namespace %s", name, namespace)
+	log.Debug("Checking if Kogito Service was deployed before with", "name", name, "in namespace", namespace)
 	kogitoRuntime := &v1beta1.KogitoRuntime{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
@@ -135,7 +135,7 @@ func (r resourceCheckServiceImpl) CheckKogitoBuildExists(kubeCli *client.Client,
 	} else if !exists {
 		return fmt.Errorf("Looks like a Kogito Build with the name '%s' doesn't exist in this project. Please try another name ", name)
 	} else {
-		log.Debugf("Kogito Build with name '%s' was found in the project '%s' ", name, namespace)
+		log.Debug("Found kogito build with", "name", name, "in namespace", namespace)
 		return nil
 	}
 }
@@ -148,14 +148,14 @@ func (r resourceCheckServiceImpl) CheckKogitoBuildNotExists(kubeCli *client.Clie
 	} else if exists {
 		return fmt.Errorf("Looks like a Kogito Build with the name '%s' already exists in this context/namespace. Please try another name ", name)
 	} else {
-		log.Debugf("Kogito Build with name '%s' was not found in the project '%s' ", name, namespace)
+		log.Debug("Not found kogito build", "name", name, "in namespace", namespace)
 		return nil
 	}
 }
 
 func isKogitoBuildExists(kubeCli *client.Client, name string, namespace string) (bool, error) {
 	log := context.GetDefaultLogger()
-	log.Debugf("Checking if Kogito Build '%s' was deployed before on namespace %s", name, namespace)
+	log.Debug("Checking if Kogito Build was deployed before with", "name", name, "in namespace", namespace)
 	kogitoBuild := &v1beta1.KogitoBuild{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,

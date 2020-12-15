@@ -16,7 +16,6 @@ package mappers
 
 import (
 	"fmt"
-
 	"github.com/cucumber/godog"
 	"github.com/kiegroup/kogito-cloud-operator/test/types"
 	bddtypes "github.com/kiegroup/kogito-cloud-operator/test/types"
@@ -34,9 +33,7 @@ const (
 	kogitoServiceDeploymentLabelKey = "deployment-label"
 
 	// DataTable second column
-	kogitoServiceInfraKey      = "infra"
-	kogitoServiceDabaseTypeKey = "database-type"
-	kogitoServiceNameTypeKey   = "name"
+	kogitoServiceInfraKey = "infra"
 )
 
 // MapKogitoServiceTable maps Cucumber table to KogitoServiceHolder
@@ -92,12 +89,6 @@ func mapKogitoServiceConfigTableRow(row *TableRow, kogitoService *bddtypes.Kogit
 	switch secondColumn {
 	case kogitoServiceInfraKey:
 		kogitoService.KogitoService.GetSpec().AddInfra(getThirdColumn(row))
-
-	case kogitoServiceDabaseTypeKey:
-		kogitoService.DatabaseType = getThirdColumn(row)
-
-	case kogitoServiceNameTypeKey:
-		kogitoService.KogitoService.SetName(getThirdColumn(row))
 
 	default:
 		return false, fmt.Errorf("Unrecognized config configuration option: %s", secondColumn)

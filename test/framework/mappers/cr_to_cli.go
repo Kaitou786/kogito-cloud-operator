@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/kiegroup/kogito-cloud-operator/pkg/apis/app/v1beta1"
+	"github.com/kiegroup/kogito-cloud-operator/api/v1beta1"
 	bddtypes "github.com/kiegroup/kogito-cloud-operator/test/types"
 )
 
@@ -137,10 +137,6 @@ func GetInfraCLIFlags(infraResource *v1beta1.KogitoInfra) []string {
 
 	if resourceNamespace := infraResource.Spec.Resource.Namespace; len(resourceNamespace) > 0 {
 		cmd = append(cmd, "--resource-namespace", resourceNamespace)
-	}
-
-	for key, value := range infraResource.Spec.InfraProperties {
-		cmd = append(cmd, "--property", fmt.Sprintf("%s=%s", key, value))
 	}
 
 	return cmd

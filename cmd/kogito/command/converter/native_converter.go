@@ -43,7 +43,7 @@ func FromArgsToNative(nativeFlag bool, resourceType flag.ResourceType, resource 
 		if nativeFlag && !native {
 			return native, fmt.Errorf("specified native binary build but no native executable found in '%s'", resource)
 		} else if !nativeFlag && native {
-			context.GetDefaultLogger().Infof("Did not specify native build but found native executable. Setting binary build to native.")
+			context.GetDefaultLogger().Info("Did not specify native build but found native executable. Setting binary build to native.")
 			return native, nil
 		}
 		return native, nil

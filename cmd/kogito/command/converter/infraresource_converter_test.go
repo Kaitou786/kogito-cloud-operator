@@ -15,10 +15,9 @@
 package converter
 
 import (
-	"testing"
-
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/flag"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func Test_FromResourceFlagsToResource(t *testing.T) {
@@ -29,7 +28,7 @@ func Test_FromResourceFlagsToResource(t *testing.T) {
 		ResourceNamespace: "infinispan-namespace",
 	}
 
-	resource := FromInfraResourceFlagsToResource(flags)
+	resource := FromResourceFlagsToResource(flags)
 	assert.Equal(t, "infinispan.org/v1", resource.APIVersion)
 	assert.Equal(t, "Infinispan", resource.Kind)
 	assert.Equal(t, "infinispan-instance-name", resource.Name)

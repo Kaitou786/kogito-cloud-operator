@@ -99,7 +99,7 @@ func TestNewProject_WhenTheresNoNamedFlag(t *testing.T) {
 	test.SetupCliTest(cli, context.CommandFactory{BuildCommands: BuildCommands})
 	lines, _, err := test.ExecuteCli()
 	assert.NoError(t, err)
-	assert.Contains(t, lines, "created successfully")
+	assert.Contains(t, lines, "Successfully created")
 	assert.Contains(t, lines, ns)
 }
 

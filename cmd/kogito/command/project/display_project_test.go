@@ -62,6 +62,6 @@ func TestDisplayProjectCmd_WithJsonOutputFormat(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotEmpty(t, o)
 	assert.Contains(t, o, "\"level\":\"INFO\"")
-	assert.Contains(t, o, "\"name\":\"kogito-cli\"")
-	assert.Contains(t, o, "\"message\":\"Using project '"+ns+"'\"")
+	assert.Contains(t, o, "\"message\":\"Using project")
+	assert.Contains(t, o, "\"Project\":\""+ns+"\"")
 }
