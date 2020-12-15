@@ -28,7 +28,7 @@ func Test_FromResourceFlagsToResource(t *testing.T) {
 		ResourceNamespace: "infinispan-namespace",
 	}
 
-	resource := FromResourceFlagsToResource(flags)
+	resource := FromInfraResourceFlagsToResource(flags)
 	assert.Equal(t, "infinispan.org/v1", resource.APIVersion)
 	assert.Equal(t, "Infinispan", resource.Kind)
 	assert.Equal(t, "infinispan-instance-name", resource.Name)

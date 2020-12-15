@@ -16,6 +16,7 @@ package framework
 
 import (
 	"fmt"
+	apiextensionsv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	"strings"
 
 	coreapps "k8s.io/api/apps/v1"
@@ -62,6 +63,10 @@ var (
 
 	// KogitoOperatorDependencies contains list of operators to be used together with Kogito operator
 	KogitoOperatorDependencies = []string{kogitoInfinispanDependencyName, kogitoKafkaDependencyName, kogitoKeycloakDependencyName}
+
+	// KogitoOperatorMongoDBDependency is the MongoDB identifier for installation
+	KogitoOperatorMongoDBDependency = infra.MongoDBKind
+	mongoDBOperatorTimeoutInMin     = 10
 
 	commonKogitoOperatorDependencies = map[string]dependentOperator{
 		kogitoInfinispanDependencyName: {
@@ -423,4 +428,88 @@ func DeleteSubscription(subscription *olmapiv1alpha1.Subscription) error {
 
 func getOperatorImageNameAndTag() string {
 	return fmt.Sprintf("%s:%s", config.GetOperatorImageName(), config.GetOperatorImageTag())
+}
+
+// DeployMongoDBOperatorFromYaml Deploy Kogito Operator from yaml files
+func DeployMongoDBOperatorFromYaml(namespace string) error {
+	GetLogger(namespace).Info("Deploy MongoDB from yaml files", "file uri", mongoDBOperatorDeployFilesURI)
+
+	if !infra.IsMongoDBAvailable(kubeClient) {
+		if err := loadResource(namespace, mongoDBOperatorDeployFilesURI+"crds/mongodb.com_mongodb_crd.yaml", &apiextensionsv1beta1.CustomResourceDefinition{}, func(object interface{}) {
+			// Short fix as 'plural' from mongodb is not mongodbs ...
+			// https://github.com/mongodb/mongodb-kubernetes-operator/issues/237
+			crdName := object.(*apiextensionsv1beta1.CustomResourceDefinition).Spec.Names.Plural
+			if !strings.HasSuffix(crdName, "s") {
+				crdName += "s"
+				metadataName := fmt.Sprintf("%s.%s", crdName, object.(*apiextensionsv1beta1.CustomResourceDefinition).Spec.Group)
+
+				GetLogger(namespace).Info("MongoDB Crd, changing plural", "from", object.(*apiextensionsv1beta1.CustomResourceDefinition).Spec.Names.Plural, "to", crdName)
+				GetLogger(namespace).Info("MongoDB Crd, changing metadata name", "from", object.(*apiextensionsv1beta1.CustomResourceDefinition).ObjectMeta.Name, "to", metadataName)
+
+				object.(*apiextensionsv1beta1.CustomResourceDefinition).Spec.Names.Plural = crdName
+				object.(*apiextensionsv1beta1.CustomResourceDefinition).ObjectMeta.Name = metadataName
+			}
+		}); err != nil {
+			return err
+		}
+	}
+
+	if err := loadResource(namespace, mongoDBOperatorDeployFilesURI+"service_account.yaml", &corev1.ServiceAccount{}, nil); err != nil {
+		return err
+	}
+	if err := loadResource(namespace, mongoDBOperatorDeployFilesURI+"role.yaml", &rbac.Role{}, nil); err != nil {
+		return err
+	}
+	if err := loadResource(namespace, mongoDBOperatorDeployFilesURI+"role_binding.yaml", &rbac.RoleBinding{}, nil); err != nil {
+		return err
+	}
+
+	// Then deploy operator
+	err := loadResource(namespace, mongoDBOperatorDeployFilesURI+"operator.yaml", &coreapps.Deployment{}, func(object interface{}) {
+		if IsOpenshift() {
+			GetLogger(namespace).Debug("Setup MANAGED_SECURITY_CONTEXT env in MongoDB operator for Openshift")
+			object.(*coreapps.Deployment).Spec.Template.Spec.Containers[0].Env = append(object.(*coreapps.Deployment).Spec.Template.Spec.Containers[0].Env,
+				corev1.EnvVar{
+					Name:  "MANAGED_SECURITY_CONTEXT",
+					Value: "true",
+				})
+		}
+	})
+	if err != nil {
+		return err
+	}
+
+	// Set correct file to be deployed
+	if IsOpenshift() {
+		// Used to give correct access to pvc/secret
+		// https://github.com/mongodb/mongodb-kubernetes-operator/issues/212#issuecomment-704744307
+		output, err := CreateCommand("oc", "adm", "policy", "add-scc-to-user", "anyuid", "system:serviceaccount:"+namespace+":mongodb-kubernetes-operator").WithLoggerContext(namespace).Sync("add-scc-to-user").Execute()
+		if err != nil {
+			GetLogger(namespace).Error(err, "Error while trying to set specific rights for MongoDB deployments")
+			return err
+		}
+		GetLogger(namespace).Info(output)
+	}
+
+	return nil
+}
+
+// WaitForMongoDBOperatorRunning waits for MongoDB operator to be running
+func WaitForMongoDBOperatorRunning(namespace string) error {
+	return WaitForOnOpenshift(namespace, "MongoDB operator running", mongoDBOperatorTimeoutInMin,
+		func() (bool, error) {
+			return isMongoDBOperatorRunning(namespace)
+		})
+}
+
+func isMongoDBOperatorRunning(namespace string) (bool, error) {
+	exists, err := infra.IsMongoDBOperatorAvailable(kubeClient, namespace)
+	if err != nil {
+		if exists {
+			return false, nil
+		}
+		return false, err
+	}
+
+	return exists, nil
 }

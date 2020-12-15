@@ -16,6 +16,7 @@ require (
 	github.com/keycloak/keycloak-operator v0.0.0-20200917060808-9858b19ca8bf
 	github.com/machinebox/graphql v0.2.2
 	github.com/matryer/is v1.4.0 // indirect
+	github.com/mongodb/mongodb-kubernetes-operator v0.3.0
 	github.com/onsi/ginkgo v1.12.1
 	github.com/onsi/gomega v1.10.1
 	github.com/openshift/api v3.9.1-0.20190924102528-32369d4db2ad+incompatible

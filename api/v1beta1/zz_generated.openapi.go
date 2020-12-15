@@ -369,6 +369,21 @@ func schema__api_v1beta1_KogitoInfraSpec(ref common.ReferenceCallback) common.Op
 							Ref:         ref("./api/v1beta1.Resource"),
 						},
 					},
+					"infraProperties": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Optional properties which would be needed to setup correct runtime/service configuration, based on the resource type. For example, MongoDB will require `username` and `database` as properties for a correct setup, else it will fail",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
+						},
+					},
 				},
 			},
 		},

@@ -8,40 +8,49 @@ metadata:
           "apiVersion": "app.kiegroup.org/v1beta1",
           "kind": "KogitoBuild",
           "metadata": {
-            "name": "kogitobuild-sample"
+            "name": "example-quarkus"
           },
           "spec": {
-            "foo": "bar"
+            "gitSource": {
+              "contextDir": "process-quarkus-example",
+              "uri": "https://github.com/kiegroup/kogito-examples"
+            },
+            "type": "RemoteSource"
           }
         },
         {
           "apiVersion": "app.kiegroup.org/v1beta1",
           "kind": "KogitoInfra",
           "metadata": {
-            "name": "kogitoinfra-sample"
+            "name": "kogito-infinispan-infra"
           },
           "spec": {
-            "foo": "bar"
+            "resource": {
+              "apiVersion": "infinispan.org/v1",
+              "kind": "Infinispan"
+            }
           }
         },
         {
           "apiVersion": "app.kiegroup.org/v1beta1",
           "kind": "KogitoRuntime",
           "metadata": {
-            "name": "kogitoruntime-sample"
+            "name": "process-quarkus-example"
           },
           "spec": {
-            "foo": "bar"
+            "image": "quay.io/kiegroup/process-quarkus-example",
+            "replicas": 1
           }
         },
         {
           "apiVersion": "app.kiegroup.org/v1beta1",
           "kind": "KogitoSupportingService",
           "metadata": {
-            "name": "kogitosupportingservice-sample"
+            "name": "kogito-jobs-service"
           },
           "spec": {
-            "foo": "bar"
+            "replicas": 1,
+            "serviceType": "JobsService"
           }
         }
       ]
@@ -164,6 +173,16 @@ spec:
           - keycloak.org
           resources:
           - keycloaks
+          verbs:
+          - get
+          - create
+          - list
+          - delete
+          - watch
+        - apiGroups:
+          - mongodb.com
+          resources:
+          - mongodbs
           verbs:
           - get
           - create

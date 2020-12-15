@@ -1,4 +1,4 @@
-// Copyright 2020 Red Hat, Inc. and/or its affiliates
+// Copyright 2019 Red Hat, Inc. and/or its affiliates
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,24 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package types
+package converter
 
 import (
-	"github.com/kiegroup/kogito-cloud-operator/api/v1beta1"
+	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/flag"
+	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/util"
 )
 
-// KogitoServiceHolder Helper structure holding informations which are not available in KogitoService
-type KogitoServiceHolder struct {
-	v1beta1.KogitoService
-
-	DatabaseType string
-}
-
-// KogitoBuildHolder Helper structure holding informations for Kogito build
-type KogitoBuildHolder struct {
-	*KogitoServiceHolder
-	*v1beta1.KogitoBuild
-
-	// Specifies folder with prebuilt Kogito binaries to be uploaded to KogitoBuild
-	BuiltBinaryFolder string
+// FromPropertiesFlagToStringMap converts a properties flags in the format of key=value properties to a map[key]=value
+func FromPropertiesFlagToStringMap(propertiesFlags *flag.PropertiesFlag) map[string]string {
+	return util.FromStringsKeyPairToMap(propertiesFlags.Properties)
 }

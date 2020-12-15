@@ -114,6 +114,7 @@ func (r *KogitoInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	watchedObjects = append(watchedObjects, getInfinispanWatchedObjects()...)
 	watchedObjects = append(watchedObjects, getKafkaWatchedObjects()...)
 	watchedObjects = append(watchedObjects, getKeycloakWatchedObjects()...)
+	watchedObjects = append(watchedObjects, getMongoDBWatchedObjects()...)
 
 	controllerWatcher := framework.NewControllerWatcher(r.Client, mgr, c, &v1beta1.KogitoInfra{})
 	if err = controllerWatcher.Watch(watchedObjects...); err != nil {
@@ -124,11 +125,16 @@ func (r *KogitoInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 }
 
 func (r *KogitoInfraReconciler) getReconcileResultFor(err error, requeue bool) (reconcile.Result, error) {
-	// generic reconciliation error
-	if reasonForError(err) == v1beta1.ReconciliationFailure {
-		r.Log.Warn("Error while reconciling", "KogitoInfra", err.Error())
+
+	switch reasonForError(err) {
+	case v1beta1.ReconciliationFailure:
+		r.Log.Warn("Error while reconciling KogitoInfra", "error", err.Error())
 		return reconcile.Result{RequeueAfter: 0, Requeue: false}, err
+	case v1beta1.ResourceMissingResourceConfig, v1beta1.ResourceConfigError:
+		r.Log.Error(err, "KogitoInfra configuration error")
+		return reconcile.Result{RequeueAfter: 0, Requeue: false}, nil
 	}
+
 	// no requeue, no errors, stop reconciliation
 	if !requeue && err == nil {
 		r.Log.Debug("No need reconciliation for KogitoInfra")

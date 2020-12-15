@@ -54,5 +54,6 @@ func (r *KogitoInfraReconciler) getSupportedInfraResources(context targetContext
 		getResourceClass(infrastructure.KafkaKind, infrastructure.KafkaAPIVersion):                           &kafkaInfraReconciler{targetContext: context, log: logger.GetLogger("kafka")},
 		getResourceClass(infrastructure.KeycloakKind, infrastructure.KeycloakAPIVersion):                     &keycloakInfraReconciler{targetContext: context, log: logger.GetLogger("keycloak")},
 		getResourceClass(infrastructure.KnativeEventingBrokerKind, infrastructure.KnativeEventingAPIVersion): &knativeInfraReconciler{targetContext: context, log: logger.GetLogger("knative")},
+		getResourceClass(infrastructure.MongoDBKind, infrastructure.MongoDBAPIVersion):                       &mongoDBInfraReconciler{targetContext: context, log: logger.GetLogger("mongodb")},
 	}
 }

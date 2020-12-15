@@ -38,7 +38,7 @@ func (e reconciliationError) Error() string {
 func errorForResourceNotFound(kind, instance, namespace string) reconciliationError {
 	return reconciliationError{
 		Reason:     v1beta1.ResourceNotFound,
-		innerError: fmt.Errorf("%s instance(%s) not found in namespace %s", kind, instance, namespace),
+		innerError: fmt.Errorf("%s resource(%s) not found in namespace %s", kind, instance, namespace),
 	}
 }
 
@@ -56,6 +56,20 @@ func (r *KogitoInfraReconciler) errorForUnsupportedAPI(instance *v1beta1.KogitoI
 			instance.Spec.Resource.APIVersion,
 			instance.Spec.Resource.Kind,
 			r.getSupportedResources()),
+	}
+}
+
+func errorForMissingResourceConfig(instance *v1beta1.KogitoInfra, configName string) reconciliationError {
+	return reconciliationError{
+		Reason:     v1beta1.ResourceMissingResourceConfig,
+		innerError: fmt.Errorf("Resource %s, configuration information (%s) is missing", instance.Name, configName),
+	}
+}
+
+func errorForResourceConfigError(instance *v1beta1.KogitoInfra, errorMsg string) reconciliationError {
+	return reconciliationError{
+		Reason:     v1beta1.ResourceConfigError,
+		innerError: fmt.Errorf("Error in configuration for the infrastructure resource %s. Error is: %s", instance.Name, errorMsg),
 	}
 }
 

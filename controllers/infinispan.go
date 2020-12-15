@@ -56,16 +56,16 @@ const (
 	envVarInfinispanUser
 	// envVarInfinispanPassword environment variable for setting infinispan password
 	envVarInfinispanPassword
-	enablePersistenceEnvKey = "ENABLE_PERSISTENCE"
 	// saslPlain is the PLAIN type.
-	saslPlain                  = "PLAIN"
-	pkcs12CertType             = "PKCS12"
-	certMountPath              = infrastructure.KogitoHomeDir + "/certs/infinispan"
-	truststoreSecretKey        = "truststore.p12"
-	truststoreMountPath        = certMountPath + "/" + truststoreSecretKey
-	infinispanTLSSecretKey     = "tls.crt"
-	infinispanCertMountName    = "infinispan-cert"
-	infinispanEnvKeyCredSecret = "INFINISPAN_CREDENTIAL_SECRET"
+	saslPlain                         = "PLAIN"
+	pkcs12CertType                    = "PKCS12"
+	certMountPath                     = infrastructure.KogitoHomeDir + "/certs/infinispan"
+	truststoreSecretKey               = "truststore.p12"
+	truststoreMountPath               = certMountPath + "/" + truststoreSecretKey
+	infinispanTLSSecretKey            = "tls.crt"
+	infinispanCertMountName           = "infinispan-cert"
+	infinispanEnvKeyCredSecret        = "INFINISPAN_CREDENTIAL_SECRET"
+	infinispanEnablePersistenceEnvKey = "ENABLE_PERSISTENCE"
 )
 
 var (
@@ -116,7 +116,7 @@ func (i *infinispanInfraReconciler) getInfinispanSecretEnvVars(infinispanInstanc
 		}
 	}
 
-	envProps = append(envProps, framework.CreateEnvVar(enablePersistenceEnvKey, "true"))
+	envProps = append(envProps, framework.CreateEnvVar(infinispanEnablePersistenceEnvKey, "true"))
 	secretName := customInfinispanSecret.Name
 	envProps = append(envProps, framework.CreateEnvVar(infinispanEnvKeyCredSecret, secretName))
 	envProps = append(envProps, framework.CreateSecretEnvVar(propertiesInfinispanSpring[envVarInfinispanUser], secretName, infrastructure.InfinispanSecretUsernameKey))

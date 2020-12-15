@@ -21,6 +21,7 @@ import (
 	kafkabetav1 "github.com/kiegroup/kogito-cloud-operator/api/kafka/v1beta1"
 	"github.com/kiegroup/kogito-cloud-operator/api/v1beta1"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/logger"
+	mongodb "github.com/mongodb/mongodb-kubernetes-operator/pkg/apis/mongodb/v1"
 	appsv1 "github.com/openshift/api/apps/v1"
 	buildv1 "github.com/openshift/api/build/v1"
 	imgv1 "github.com/openshift/api/image/v1"
@@ -89,6 +90,7 @@ func GetRegisteredSchemeBuilder() runtime.SchemeBuilder {
 		imgv1.Install,
 		apiextensionsv1beta1.AddToScheme,
 		kafkabetav1.SchemeBuilder.AddToScheme,
+		mongodb.SchemeBuilder.AddToScheme,
 		infinispanv1.AddToScheme,
 		keycloakv1alpha1.SchemeBuilder.AddToScheme,
 		operatormkt.SchemeBuilder.AddToScheme, olmapiv1.AddToScheme, olmapiv1alpha1.AddToScheme,
@@ -119,6 +121,7 @@ func GetRegisteredSchema() *runtime.Scheme {
 	metav1.AddToGroupVersion(s, monv1.SchemeGroupVersion)
 	metav1.AddToGroupVersion(s, routev1.GroupVersion)
 	metav1.AddToGroupVersion(s, infinispanv1.SchemeGroupVersion)
+	metav1.AddToGroupVersion(s, mongodb.SchemeGroupVersion)
 	metav1.AddToGroupVersion(s, kafkabetav1.SchemeGroupVersion)
 	metav1.AddToGroupVersion(s, grafana.SchemeGroupVersion)
 	metav1.AddToGroupVersion(s, olmv1.SchemeGroupVersion)
