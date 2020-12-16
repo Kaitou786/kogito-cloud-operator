@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/logger"
 	"net/url"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
 
 	"github.com/kiegroup/kogito-cloud-operator/api/v1beta1"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/client"
@@ -27,7 +28,6 @@ import (
 	mongodb "github.com/mongodb/mongodb-kubernetes-operator/pkg/apis/mongodb/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 )
 
@@ -218,17 +218,8 @@ type mongoDBInfraReconciler struct {
 }
 
 // getMongoDBWatchedObjects provide list of object that needs to be watched to maintain MongoDB kogitoInfra resource
-func getMongoDBWatchedObjects() []framework.WatchedObjects {
-	return []framework.WatchedObjects{
-		{
-			GroupVersion: mongodb.SchemeGroupVersion,
-			AddToScheme:  mongodb.SchemeBuilder.AddToScheme,
-			Objects:      []runtime.Object{&mongodb.MongoDB{}},
-		},
-		{
-			Objects: []runtime.Object{&corev1.Secret{}},
-		},
-	}
+func appendMongoDBWatchedObjects(b *builder.Builder) *builder.Builder {
+	return b.Owns(&corev1.Secret{})
 }
 
 // Reconcile reconcile Kogito infra object

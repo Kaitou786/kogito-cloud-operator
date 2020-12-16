@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/logger"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"software.sslmate.com/src/go-pkcs12"
 	"sort"
 
@@ -29,7 +30,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
@@ -419,15 +419,6 @@ func getLatestInfinispanCondition(instance *infinispan.Infinispan) *infinispan.I
 }
 
 // getInfinispanWatchedObjects provide list of object that needs to be watched to maintain Infinispan kogitoInfra resource
-func getInfinispanWatchedObjects() []framework.WatchedObjects {
-	return []framework.WatchedObjects{
-		{
-			GroupVersion: infinispan.SchemeGroupVersion,
-			AddToScheme:  infinispan.AddToScheme,
-			Objects:      []runtime.Object{&infinispan.Infinispan{}},
-		},
-		{
-			Objects: []runtime.Object{&corev1.Secret{}},
-		},
-	}
+func appendInfinispanWatchedObjects(b *builder.Builder) *builder.Builder {
+	return b.Owns(&corev1.Secret{})
 }

@@ -31,13 +31,9 @@ limitations under the License.
 package controllers
 
 import (
-	"github.com/kiegroup/kogito-cloud-operator/pkg/framework"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/infrastructure"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/logger"
-	"sigs.k8s.io/controller-runtime/pkg/controller"
-	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 	"time"
 
 	"github.com/kiegroup/kogito-cloud-operator/pkg/client"
@@ -99,29 +95,12 @@ func (r *KogitoInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 // SetupWithManager registers the controller with manager
 func (r *KogitoInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	r.Log.Debug("Adding watched objects for KogitoInfra controller")
-	// Create a new controller
-	c, err := controller.New("kogitoinfra-controller", mgr, controller.Options{Reconciler: r})
-	if err != nil {
-		return err
-	}
-
-	err = c.Watch(&source.Kind{Type: &v1beta1.KogitoInfra{}}, &handler.EnqueueRequestForObject{})
-	if err != nil {
-		return err
-	}
-
-	var watchedObjects []framework.WatchedObjects
-	watchedObjects = append(watchedObjects, getInfinispanWatchedObjects()...)
-	watchedObjects = append(watchedObjects, getKafkaWatchedObjects()...)
-	watchedObjects = append(watchedObjects, getKeycloakWatchedObjects()...)
-	watchedObjects = append(watchedObjects, getMongoDBWatchedObjects()...)
-
-	controllerWatcher := framework.NewControllerWatcher(r.Client, mgr, c, &v1beta1.KogitoInfra{})
-	if err = controllerWatcher.Watch(watchedObjects...); err != nil {
-		return err
-	}
-
-	return nil
+	b := ctrl.NewControllerManagedBy(mgr).For(&v1beta1.KogitoInfra{})
+	b = appendInfinispanWatchedObjects(b)
+	b = appendKafkaWatchedObjects(b)
+	b = appendKeycloakWatchedObjects(b)
+	b = appendMongoDBWatchedObjects(b)
+	return b.Complete(r)
 }
 
 func (r *KogitoInfraReconciler) getReconcileResultFor(err error, requeue bool) (reconcile.Result, error) {

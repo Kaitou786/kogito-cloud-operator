@@ -17,12 +17,11 @@ package controllers
 import (
 	keycloakv1alpha1 "github.com/keycloak/keycloak-operator/pkg/apis/keycloak/v1alpha1"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/client/kubernetes"
-	"github.com/kiegroup/kogito-cloud-operator/pkg/framework"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/infrastructure"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/logger"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
@@ -38,14 +37,8 @@ type keycloakInfraReconciler struct {
 }
 
 // getKeycloakWatchedObjects provide list of object that needs to be watched to maintain Keycloak kogitoInfra resource
-func getKeycloakWatchedObjects() []framework.WatchedObjects {
-	return []framework.WatchedObjects{
-		{
-			GroupVersion: keycloakv1alpha1.SchemeGroupVersion,
-			AddToScheme:  keycloakv1alpha1.SchemeBuilder.AddToScheme,
-			Objects:      []runtime.Object{&keycloakv1alpha1.Keycloak{}},
-		},
-	}
+func appendKeycloakWatchedObjects(b *builder.Builder) *builder.Builder {
+	return b
 }
 
 // Reconcile reconcile Kogito infra object

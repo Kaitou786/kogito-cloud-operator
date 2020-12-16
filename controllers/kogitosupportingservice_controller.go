@@ -38,10 +38,11 @@ import (
 	imgv1 "github.com/openshift/api/image/v1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-	"reflect"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/event"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	"sigs.k8s.io/controller-runtime/pkg/source"
 	"time"
 
 	"github.com/kiegroup/kogito-cloud-operator/pkg/client"
@@ -131,12 +132,8 @@ func (r *KogitoSupportingServiceReconciler) SetupWithManager(mgr ctrl.Manager) e
 		For(&appv1beta1.KogitoSupportingService{}, builder.WithPredicates(pred)).
 		Owns(&corev1.Service{}).Owns(&appsv1.Deployment{}).Owns(&corev1.ConfigMap{})
 
-	infraPredicate := predicate.Funcs{
-		UpdateFunc: func(e event.UpdateEvent) bool {
-			return isKogitoInfraUpdated(e.ObjectOld.(*appv1beta1.KogitoInfra), e.ObjectNew.(*appv1beta1.KogitoInfra))
-		},
-	}
-	b.Owns(&appv1beta1.KogitoInfra{}, builder.WithPredicates(infraPredicate))
+	infraHandler := &handler.EnqueueRequestForOwner{IsController: false, OwnerType: &appv1beta1.KogitoSupportingService{}}
+	b.Watches(&source.Kind{Type: &appv1beta1.KogitoInfra{}}, infraHandler)
 
 	if r.IsOpenshift() {
 		b.Owns(&routev1.Route{}).Owns(&imgv1.ImageStream{})
@@ -184,10 +181,6 @@ func contains(allServices []appv1beta1.ServiceType, testService appv1beta1.Servi
 		}
 	}
 	return false
-}
-
-func isKogitoInfraUpdated(oldKogitoInfra, newKogitoInfra *appv1beta1.KogitoInfra) bool {
-	return !reflect.DeepEqual(oldKogitoInfra.Status.AppProps, newKogitoInfra.Status.AppProps) || !reflect.DeepEqual(oldKogitoInfra.Status.Env, newKogitoInfra.Status.Env)
 }
 
 // SupportingServiceResource Interface to represent type of kogito supporting service resources like JobsService & MgmtConcole

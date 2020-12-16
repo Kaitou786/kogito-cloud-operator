@@ -17,6 +17,7 @@ package controllers
 import (
 	"fmt"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/logger"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sort"
 	"strings"
 	"time"
@@ -27,7 +28,6 @@ import (
 	"github.com/kiegroup/kogito-cloud-operator/pkg/infrastructure"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/infrastructure/services"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 )
 
@@ -74,14 +74,8 @@ type kafkaInfraReconciler struct {
 }
 
 // getKafkaWatchedObjects provide list of object that needs to be watched to maintain Kafka kogitoInfra resource
-func getKafkaWatchedObjects() []framework.WatchedObjects {
-	return []framework.WatchedObjects{
-		{
-			GroupVersion: kafkabetav1.SchemeGroupVersion,
-			AddToScheme:  kafkabetav1.SchemeBuilder.AddToScheme,
-			Objects:      []runtime.Object{&kafkabetav1.Kafka{}},
-		},
-	}
+func appendKafkaWatchedObjects(b *builder.Builder) *builder.Builder {
+	return b
 }
 
 // Reconcile reconcile Kogito infra object

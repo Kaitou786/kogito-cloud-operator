@@ -45,7 +45,9 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/event"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
 // KogitoRuntimeReconciler reconciles a KogitoRuntime object
@@ -127,6 +129,9 @@ func (r *KogitoRuntimeReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	b := ctrl.NewControllerManagedBy(mgr).
 		For(&v1beta1.KogitoRuntime{}, builder.WithPredicates(pred)).
 		Owns(&corev1.Service{}).Owns(&appsv1.Deployment{}).Owns(&corev1.ConfigMap{})
+
+	infraHandler := &handler.EnqueueRequestForOwner{IsController: false, OwnerType: &v1beta1.KogitoRuntime{}}
+	b.Watches(&source.Kind{Type: &v1beta1.KogitoInfra{}}, infraHandler)
 
 	if r.IsOpenshift() {
 		b.Owns(&routev1.Route{}).Owns(&imagev1.ImageStream{})
