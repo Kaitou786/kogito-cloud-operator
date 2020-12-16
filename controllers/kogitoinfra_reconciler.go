@@ -20,13 +20,13 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
+// InfraReconciler Interface to represent type of supported kogito infra reconciliation algorithm for resources like Infinispan, kafka & keycloak
+type InfraReconciler interface {
+	Reconcile() (requeue bool, resultErr error)
+}
+
 type targetContext struct {
 	client   *client.Client
 	instance *v1beta1.KogitoInfra
 	scheme   *runtime.Scheme
-}
-
-// InfraReconciler Interface to represent type of supported kogito infra reconciliation algorithm for resources like Infinispan, kafka & keycloak
-type InfraReconciler interface {
-	Reconcile() (requeue bool, resultErr error)
 }

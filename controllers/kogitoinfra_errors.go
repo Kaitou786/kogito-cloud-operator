@@ -49,13 +49,13 @@ func errorForResourceAPINotFound(resource *v1beta1.Resource) reconciliationError
 	}
 }
 
-func (r *KogitoInfraReconciler) errorForUnsupportedAPI(instance *v1beta1.KogitoInfra) reconciliationError {
+func errorForUnsupportedAPI(instance *v1beta1.KogitoInfra) reconciliationError {
 	return reconciliationError{
 		Reason: v1beta1.UnsupportedAPIKind,
 		innerError: fmt.Errorf("API %s is not supported for kind %s. Supported APIs are: %v",
 			instance.Spec.Resource.APIVersion,
 			instance.Spec.Resource.Kind,
-			r.getSupportedResources()),
+			getSupportedResources()),
 	}
 }
 
@@ -80,8 +80,8 @@ func errorForResourceNotReadyError(err error) reconciliationError {
 	}
 }
 
-func (r *KogitoInfraReconciler) getSupportedResources() []string {
-	res := r.getSupportedInfraResources(targetContext{})
+func getSupportedResources() []string {
+	res := getSupportedInfraResources(targetContext{})
 	keys := make([]string, 0, len(res))
 	for k := range res {
 		keys = append(keys, k)

@@ -212,6 +212,14 @@ func (i *mongoDBInfraReconciler) createCustomKogitoMongoDBSecret(namespace strin
 	return secret, nil
 }
 
+func initMongoDBInfraReconciler(context targetContext) *mongoDBInfraReconciler {
+	log := logger.GetLogger("mongoDB")
+	return &mongoDBInfraReconciler{
+		targetContext: context,
+		log:           log,
+	}
+}
+
 type mongoDBInfraReconciler struct {
 	targetContext
 	log logger.Logger

@@ -27,13 +27,13 @@ import (
 	"time"
 )
 
-// MgmtConsoleSupportingServiceResource implementation of SupportingServiceResource
-type MgmtConsoleSupportingServiceResource struct {
+// mgmtConsoleSupportingServiceResource implementation of SupportingServiceResource
+type mgmtConsoleSupportingServiceResource struct {
 	log logger.Logger
 }
 
 // Reconcile reconcile Management Console
-func (m *MgmtConsoleSupportingServiceResource) Reconcile(client *client.Client, instance *v1beta1.KogitoSupportingService, scheme *runtime.Scheme) (reconcileAfter time.Duration, err error) {
+func (m *mgmtConsoleSupportingServiceResource) Reconcile(client *client.Client, instance *v1beta1.KogitoSupportingService, scheme *runtime.Scheme) (reconcileAfter time.Duration, err error) {
 	m.log.Info("Reconciling for", "KogitoMgmtConsole", instance.Name, "Namespace", instance.Namespace)
 	definition := services.ServiceDefinition{
 		DefaultImageName:   infrastructure.DefaultMgmtConsoleImageName,

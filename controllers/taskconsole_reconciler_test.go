@@ -38,7 +38,7 @@ func TestReconcileKogitoSupportingServiceTaskConsole_Reconcile(t *testing.T) {
 	}
 	cli := test.NewFakeClientBuilder().AddK8sObjects(instance).OnOpenShift().Build()
 
-	r := &TaskConsoleSupportingServiceResource{log: logger.GetLogger("task concole reconciler")}
+	r := &taskConsoleSupportingServiceResource{log: logger.GetLogger("task concole reconciler")}
 	// first reconciliation
 	requeueAfter, err := r.Reconcile(cli, instance, meta.GetRegisteredSchema())
 	assert.NoError(t, err)
@@ -68,7 +68,7 @@ func TestReconcileKogitoSupportingServiceTaskConsole_CustomImage(t *testing.T) {
 	}
 	cli := test.NewFakeClientBuilder().AddK8sObjects(instance).OnOpenShift().Build()
 
-	r := &TaskConsoleSupportingServiceResource{log: logger.GetLogger("task console reconciler")}
+	r := &taskConsoleSupportingServiceResource{log: logger.GetLogger("task console reconciler")}
 	requeueAfter, err := r.Reconcile(cli, instance, meta.GetRegisteredSchema())
 	assert.NoError(t, err)
 	assert.True(t, requeueAfter == 0)

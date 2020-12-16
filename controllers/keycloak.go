@@ -30,6 +30,14 @@ const (
 	keycloakMetricsExtension = "https://github.com/aerogear/keycloak-metrics-spi/releases/download/1.0.4/keycloak-metrics-spi-1.0.4.jar"
 )
 
+func initkeycloakInfraReconciler(context targetContext) *keycloakInfraReconciler {
+	log := logger.GetLogger("keycloak")
+	return &keycloakInfraReconciler{
+		targetContext: context,
+		log:           log,
+	}
+}
+
 // keycloakInfraReconciler implementation of KogitoInfraResource
 type keycloakInfraReconciler struct {
 	targetContext

@@ -144,13 +144,13 @@ func (r *KogitoSupportingServiceReconciler) SetupWithManager(mgr ctrl.Manager) e
 // fetches all the supported services managed by kogitoSupportingService controller
 func (r *KogitoSupportingServiceReconciler) getKogitoSupportingServices(instance *appv1beta1.KogitoSupportingService) map[appv1beta1.ServiceType]SupportingServiceResource {
 	return map[appv1beta1.ServiceType]SupportingServiceResource{
-		appv1beta1.DataIndex:      &DataIndexSupportingServiceResource{log: logger.GetLogger("data-index")},
-		appv1beta1.Explainability: &ExplainabilitySupportingServiceResource{log: logger.GetLogger("explainability")},
-		appv1beta1.JobsService:    &JobsServiceSupportingServiceResource{log: logger.GetLogger("jobs-service")},
-		appv1beta1.MgmtConsole:    &MgmtConsoleSupportingServiceResource{log: logger.GetLogger("mgmt-console")},
-		appv1beta1.TaskConsole:    &TaskConsoleSupportingServiceResource{log: logger.GetLogger("task-console")},
-		appv1beta1.TrustyAI:       &TrustyAISupportingServiceResource{log: logger.GetLogger("trusty-AI")},
-		appv1beta1.TrustyUI:       &TrustyUISupportingServiceResource{log: logger.GetLogger("trusty-UI")},
+		appv1beta1.DataIndex:      &dataIndexSupportingServiceResource{log: logger.GetLogger("data-index")},
+		appv1beta1.Explainability: &explainabilitySupportingServiceResource{log: logger.GetLogger("explainability")},
+		appv1beta1.JobsService:    &jobsServiceSupportingServiceResource{log: logger.GetLogger("jobs-service")},
+		appv1beta1.MgmtConsole:    &mgmtConsoleSupportingServiceResource{log: logger.GetLogger("mgmt-console")},
+		appv1beta1.TaskConsole:    &taskConsoleSupportingServiceResource{log: logger.GetLogger("task-console")},
+		appv1beta1.TrustyAI:       &trustyAISupportingServiceResource{log: logger.GetLogger("trusty-AI")},
+		appv1beta1.TrustyUI:       &trustyUISupportingServiceResource{log: logger.GetLogger("trusty-UI")},
 	}
 }
 

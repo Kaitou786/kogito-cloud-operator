@@ -26,13 +26,13 @@ import (
 	"time"
 )
 
-// TrustyAISupportingServiceResource implementation of SupportingServiceResource
-type TrustyAISupportingServiceResource struct {
+// trustyAISupportingServiceResource implementation of SupportingServiceResource
+type trustyAISupportingServiceResource struct {
 	log logger.Logger
 }
 
 // Reconcile reconcile TrustyAI Service
-func (t *TrustyAISupportingServiceResource) Reconcile(client *client.Client, instance *v1beta1.KogitoSupportingService, scheme *runtime.Scheme) (reconcileAfter time.Duration, err error) {
+func (t *trustyAISupportingServiceResource) Reconcile(client *client.Client, instance *v1beta1.KogitoSupportingService, scheme *runtime.Scheme) (reconcileAfter time.Duration, err error) {
 	t.log.Info("Reconciling KogitoTrusty")
 	t.log.Info("Injecting Trusty Index URL into KogitoService in", "Namespace", instance.Namespace)
 	if err = infrastructure.InjectTrustyURLIntoKogitoRuntimeServices(client, instance.Namespace); err != nil {

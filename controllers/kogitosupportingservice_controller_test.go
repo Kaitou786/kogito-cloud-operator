@@ -22,7 +22,6 @@ import (
 	"github.com/kiegroup/kogito-cloud-operator/pkg/logger"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/test"
 	"github.com/stretchr/testify/assert"
-	v12 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"testing"
 )
@@ -38,7 +37,7 @@ func TestReconcileKogitoSupportingService_Reconcile(t *testing.T) {
 	}
 	cli := test.NewFakeClientBuilder().AddK8sObjects(instance).OnOpenShift().Build()
 
-	r := &JobsServiceSupportingServiceResource{log: logger.GetLogger("suppporting service reconciler")}
+	r := &jobsServiceSupportingServiceResource{log: logger.GetLogger("suppporting service reconciler")}
 	// first reconciliation
 
 	requeueAfter, err := r.Reconcile(cli, instance, meta.GetRegisteredSchema())
@@ -53,78 +52,6 @@ func TestReconcileKogitoSupportingService_Reconcile(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, instance.Status)
 	assert.Len(t, instance.Status.Conditions, 1)
-}
-
-func Test_isKogitoInfraUpdated(t *testing.T) {
-	oldKogitoInfra := v1beta1.KogitoInfra{
-		Status: v1beta1.KogitoInfraStatus{
-			AppProps: map[string]string{
-				"myprops": "custom-value",
-			},
-			Env: []v12.EnvVar{
-				{
-					Name:  "myenv",
-					Value: "custom-value",
-				},
-			},
-		},
-	}
-
-	newKogitoInfra := v1beta1.KogitoInfra{
-		Status: v1beta1.KogitoInfraStatus{
-			AppProps: map[string]string{
-				"myprops": "custom-value",
-			},
-			Env: []v12.EnvVar{
-				{
-					Name:  "myenv",
-					Value: "custom-value",
-				},
-			},
-		},
-	}
-	// No change test
-	assert.False(t, isKogitoInfraUpdated(&oldKogitoInfra, &newKogitoInfra))
-
-	// Infra updated with some new AppProps
-	newKogitoInfra = v1beta1.KogitoInfra{
-		Status: v1beta1.KogitoInfraStatus{
-			AppProps: map[string]string{
-				"myprops": "custom-value",
-				"newprop": "new-custom-value",
-			},
-			Env: []v12.EnvVar{
-				{
-					Name:  "myenv",
-					Value: "custom-value",
-				},
-			},
-		},
-	}
-	// AppProps changed
-	assert.True(t, isKogitoInfraUpdated(&oldKogitoInfra, &newKogitoInfra))
-
-	// new env added
-	newKogitoInfra = v1beta1.KogitoInfra{
-		Status: v1beta1.KogitoInfraStatus{
-			AppProps: map[string]string{
-				"myprops": "custom-value",
-			},
-			Env: []v12.EnvVar{
-				{
-					Name:  "myenv",
-					Value: "custom-value",
-				},
-				{
-					Name:  "new-env",
-					Value: "new-custom-value",
-				},
-			},
-		},
-	}
-
-	// Env Changed
-	assert.True(t, isKogitoInfraUpdated(&oldKogitoInfra, &newKogitoInfra))
 }
 
 func TestContains(t *testing.T) {

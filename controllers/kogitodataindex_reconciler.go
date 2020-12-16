@@ -27,13 +27,13 @@ import (
 	"time"
 )
 
-// DataIndexSupportingServiceResource implementation of SupportingServiceResource
-type DataIndexSupportingServiceResource struct {
+// dataIndexSupportingServiceResource implementation of SupportingServiceResource
+type dataIndexSupportingServiceResource struct {
 	log logger.Logger
 }
 
 // Reconcile reconcile Data Index
-func (d *DataIndexSupportingServiceResource) Reconcile(client *client.Client, instance *appv1alpha1.KogitoSupportingService, scheme *runtime.Scheme) (reconcileAfter time.Duration, err error) {
+func (d *dataIndexSupportingServiceResource) Reconcile(client *client.Client, instance *appv1alpha1.KogitoSupportingService, scheme *runtime.Scheme) (reconcileAfter time.Duration, err error) {
 	d.log.Info("Reconciling for", "KogitoDataIndex", instance.Name, "Namespace", instance.Namespace)
 	if err = infrastructure.InjectDataIndexURLIntoKogitoRuntimeServices(client, instance.Namespace); err != nil {
 		return
@@ -60,7 +60,7 @@ var dataIndexKafkaTopics = []string{
 	"kogito-jobs-events",
 }
 
-func (d *DataIndexSupportingServiceResource) dataIndexOnDeploymentCreate(cli *client.Client, deployment *appsv1.Deployment, kogitoService appv1alpha1.KogitoService) error {
+func (d *dataIndexSupportingServiceResource) dataIndexOnDeploymentCreate(cli *client.Client, deployment *appsv1.Deployment, kogitoService appv1alpha1.KogitoService) error {
 	if len(deployment.Spec.Template.Spec.Containers) > 0 {
 		if err := infrastructure.MountProtoBufConfigMapsOnDeployment(cli, deployment); err != nil {
 			return err

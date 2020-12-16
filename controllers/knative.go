@@ -24,6 +24,14 @@ import (
 	eventingv1 "knative.dev/eventing/pkg/apis/eventing/v1"
 )
 
+func initknativeInfraReconciler(context targetContext) *knativeInfraReconciler {
+	log := logger.GetLogger("knative")
+	return &knativeInfraReconciler{
+		targetContext: context,
+		log:           log,
+	}
+}
+
 // knativeInfraReconciler for Knative resources reconciliation
 type knativeInfraReconciler struct {
 	targetContext

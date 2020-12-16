@@ -38,7 +38,7 @@ func TestReconcileKogitoSupportingServiceTrustyUI_Reconcile(t *testing.T) {
 	}
 	cli := test.NewFakeClientBuilder().AddK8sObjects(instance).OnOpenShift().Build()
 
-	r := &TrustyUISupportingServiceResource{log: logger.GetLogger("trusty ui reconciler")}
+	r := &trustyUISupportingServiceResource{log: logger.GetLogger("trusty ui reconciler")}
 
 	// first reconciliation
 	requeueAfter, err := r.Reconcile(cli, instance, meta.GetRegisteredSchema())
@@ -70,7 +70,7 @@ func TestReconcileKogitoTrustyUI_CustomImage(t *testing.T) {
 	}
 	cli := test.NewFakeClientBuilder().AddK8sObjects(instance).OnOpenShift().Build()
 
-	r := &TrustyUISupportingServiceResource{log: logger.GetLogger("trusty ui reconciler")}
+	r := &trustyUISupportingServiceResource{log: logger.GetLogger("trusty ui reconciler")}
 	requeueAfter, err := r.Reconcile(cli, instance, meta.GetRegisteredSchema())
 	assert.NoError(t, err)
 	assert.True(t, requeueAfter == 0)

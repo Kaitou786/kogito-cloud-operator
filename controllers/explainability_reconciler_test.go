@@ -42,7 +42,7 @@ func TestReconcileKogitoSupportingServiceExplainability_Reconcile(t *testing.T) 
 		},
 	}
 	cli := test.NewFakeClientBuilder().AddK8sObjects(instance, kogitoKafka).OnOpenShift().Build()
-	r := &ExplainabilitySupportingServiceResource{
+	r := &explainabilitySupportingServiceResource{
 		log: logger.GetLogger("explainability reconciler"),
 	}
 

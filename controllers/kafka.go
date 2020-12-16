@@ -67,6 +67,14 @@ func getKafkaAppProps(kafkaInstance *kafkabetav1.Kafka) (map[string]string, erro
 	return appProps, nil
 }
 
+func initkafkaInfraReconciler(context targetContext) *kafkaInfraReconciler {
+	log := logger.GetLogger("kafka")
+	return &kafkaInfraReconciler{
+		targetContext: context,
+		log:           log,
+	}
+}
+
 // kafkaInfraReconciler implementation of KogitoInfraResource
 type kafkaInfraReconciler struct {
 	targetContext

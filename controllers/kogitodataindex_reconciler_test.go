@@ -47,7 +47,7 @@ func TestKogitoSupportingServiceDataIndex_Reconcile(t *testing.T) {
 	}
 
 	cli := test.NewFakeClientBuilder().AddK8sObjects(instance, kogitoKafka, kogitoInfinispan).OnOpenShift().Build()
-	r := &DataIndexSupportingServiceResource{log: logger.GetLogger("data index reconciler")}
+	r := &dataIndexSupportingServiceResource{log: logger.GetLogger("data index reconciler")}
 	requeueAfter, err := r.Reconcile(cli, instance, meta.GetRegisteredSchema())
 	assert.NoError(t, err)
 	assert.True(t, requeueAfter == 0)

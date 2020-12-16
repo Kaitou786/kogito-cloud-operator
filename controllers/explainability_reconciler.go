@@ -26,13 +26,13 @@ import (
 	"time"
 )
 
-// ExplainabilitySupportingServiceResource implementation of SupportingServiceResource
-type ExplainabilitySupportingServiceResource struct {
+// explainabilitySupportingServiceResource implementation of SupportingServiceResource
+type explainabilitySupportingServiceResource struct {
 	log logger.Logger
 }
 
 // Reconcile reconcile Explainability Service
-func (e *ExplainabilitySupportingServiceResource) Reconcile(client *client.Client, instance *v1beta1.KogitoSupportingService, scheme *runtime.Scheme) (reconcileAfter time.Duration, err error) {
+func (e *explainabilitySupportingServiceResource) Reconcile(client *client.Client, instance *v1beta1.KogitoSupportingService, scheme *runtime.Scheme) (reconcileAfter time.Duration, err error) {
 	e.log.Info("Reconciling KogitoExplainability")
 	definition := services.ServiceDefinition{
 		DefaultImageName: infrastructure.DefaultExplainabilityImageName,

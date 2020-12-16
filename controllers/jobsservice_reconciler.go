@@ -26,13 +26,13 @@ import (
 	"time"
 )
 
-// JobsServiceSupportingServiceResource implementation of SupportingServiceResource
-type JobsServiceSupportingServiceResource struct {
+// jobsServiceSupportingServiceResource implementation of SupportingServiceResource
+type jobsServiceSupportingServiceResource struct {
 	log logger.Logger
 }
 
 // Reconcile reconcile Jobs service
-func (j *JobsServiceSupportingServiceResource) Reconcile(client *client.Client, instance *v1beta1.KogitoSupportingService, scheme *runtime.Scheme) (reconcileAfter time.Duration, err error) {
+func (j *jobsServiceSupportingServiceResource) Reconcile(client *client.Client, instance *v1beta1.KogitoSupportingService, scheme *runtime.Scheme) (reconcileAfter time.Duration, err error) {
 	j.log.Info("Reconciling for", "KogitoJobsService", instance.Name, "in Namespace", instance.Namespace)
 
 	// clean up variables if needed

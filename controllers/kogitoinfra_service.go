@@ -17,7 +17,6 @@ package controllers
 import (
 	"fmt"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/client"
-	"github.com/kiegroup/kogito-cloud-operator/pkg/logger"
 	"k8s.io/apimachinery/pkg/runtime"
 
 	"strings"
@@ -34,10 +33,10 @@ func (r *KogitoInfraReconciler) getKogitoInfraReconciler(cli *client.Client, ins
 		instance: instance,
 		scheme:   scheme,
 	}
-	if infraRes, ok := r.getSupportedInfraResources(context)[resourceClassForInstance(instance)]; ok {
+	if infraRes, ok := getSupportedInfraResources(context)[resourceClassForInstance(instance)]; ok {
 		return infraRes, nil
 	}
-	return nil, r.errorForUnsupportedAPI(instance)
+	return nil, errorForUnsupportedAPI(instance)
 }
 
 func resourceClassForInstance(instance *v1beta1.KogitoInfra) string {
@@ -48,12 +47,12 @@ func getResourceClass(kind, APIVersion string) string {
 	return strings.ToLower(fmt.Sprintf("%s.%s", kind, APIVersion))
 }
 
-func (r *KogitoInfraReconciler) getSupportedInfraResources(context targetContext) map[string]InfraReconciler {
+func getSupportedInfraResources(context targetContext) map[string]InfraReconciler {
 	return map[string]InfraReconciler{
-		getResourceClass(infrastructure.InfinispanKind, infrastructure.InfinispanAPIVersion):                 &infinispanInfraReconciler{targetContext: context, log: logger.GetLogger("infinispan")},
-		getResourceClass(infrastructure.KafkaKind, infrastructure.KafkaAPIVersion):                           &kafkaInfraReconciler{targetContext: context, log: logger.GetLogger("kafka")},
-		getResourceClass(infrastructure.KeycloakKind, infrastructure.KeycloakAPIVersion):                     &keycloakInfraReconciler{targetContext: context, log: logger.GetLogger("keycloak")},
-		getResourceClass(infrastructure.KnativeEventingBrokerKind, infrastructure.KnativeEventingAPIVersion): &knativeInfraReconciler{targetContext: context, log: logger.GetLogger("knative")},
-		getResourceClass(infrastructure.MongoDBKind, infrastructure.MongoDBAPIVersion):                       &mongoDBInfraReconciler{targetContext: context, log: logger.GetLogger("mongodb")},
+		getResourceClass(infrastructure.InfinispanKind, infrastructure.InfinispanAPIVersion):                 initInfinispanInfraReconciler(context),
+		getResourceClass(infrastructure.KafkaKind, infrastructure.KafkaAPIVersion):                           initkafkaInfraReconciler(context),
+		getResourceClass(infrastructure.KeycloakKind, infrastructure.KeycloakAPIVersion):                     initkeycloakInfraReconciler(context),
+		getResourceClass(infrastructure.KnativeEventingBrokerKind, infrastructure.KnativeEventingAPIVersion): initknativeInfraReconciler(context),
+		getResourceClass(infrastructure.MongoDBKind, infrastructure.MongoDBAPIVersion):                       initMongoDBInfraReconciler(context),
 	}
 }

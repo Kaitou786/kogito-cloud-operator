@@ -337,6 +337,14 @@ type infinispanInfraReconciler struct {
 	log logger.Logger
 }
 
+func initInfinispanInfraReconciler(context targetContext) *infinispanInfraReconciler {
+	log := logger.GetLogger("infinispan")
+	return &infinispanInfraReconciler{
+		targetContext: context,
+		log:           log,
+	}
+}
+
 // Reconcile reconcile Kogito infra object
 func (i *infinispanInfraReconciler) Reconcile() (requeue bool, resultErr error) {
 

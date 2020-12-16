@@ -44,7 +44,7 @@ func TestReconcileKogitoSupportingTrusty_Reconcile(t *testing.T) {
 	}
 	cli := test.NewFakeClientBuilder().AddK8sObjects(instance, kogitoKafka).OnOpenShift().Build()
 
-	r := &TrustyAISupportingServiceResource{log: logger.GetLogger("trusty ai reconciler")}
+	r := &trustyAISupportingServiceResource{log: logger.GetLogger("trusty ai reconciler")}
 	// basic checks
 	requeueAfter, err := r.Reconcile(cli, instance, meta.GetRegisteredSchema())
 	assert.NoError(t, err)

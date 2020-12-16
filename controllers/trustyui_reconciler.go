@@ -27,13 +27,13 @@ import (
 	"time"
 )
 
-// TrustyUISupportingServiceResource implementation of SupportingServiceResource
-type TrustyUISupportingServiceResource struct {
+// trustyUISupportingServiceResource implementation of SupportingServiceResource
+type trustyUISupportingServiceResource struct {
 	log logger.Logger
 }
 
 // Reconcile reconcile TrustyUI Service
-func (t *TrustyUISupportingServiceResource) Reconcile(client *client.Client, instance *v1beta1.KogitoSupportingService, scheme *runtime.Scheme) (reconcileAfter time.Duration, err error) {
+func (t *trustyUISupportingServiceResource) Reconcile(client *client.Client, instance *v1beta1.KogitoSupportingService, scheme *runtime.Scheme) (reconcileAfter time.Duration, err error) {
 	t.log.Info("Reconciling for", "KogitoTrustyUI", instance.Name, "Namespace", instance.Namespace)
 	definition := services.ServiceDefinition{
 		DefaultImageName:   infrastructure.DefaultTrustyUIImageName,

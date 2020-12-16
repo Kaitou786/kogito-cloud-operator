@@ -37,7 +37,7 @@ func TestReconcileKogitoJobsService_Reconcile(t *testing.T) {
 	}
 	cli := test.NewFakeClientBuilder().AddK8sObjects(instance).OnOpenShift().Build()
 
-	r := &JobsServiceSupportingServiceResource{
+	r := &jobsServiceSupportingServiceResource{
 		log: logger.GetLogger("jobsService reconciler"),
 	}
 	// first reconciliation

@@ -27,13 +27,13 @@ import (
 	"time"
 )
 
-// TaskConsoleSupportingServiceResource implementation of SupportingServiceResource
-type TaskConsoleSupportingServiceResource struct {
+// taskConsoleSupportingServiceResource implementation of SupportingServiceResource
+type taskConsoleSupportingServiceResource struct {
 	log logger.Logger
 }
 
 // Reconcile reconcile Task Console
-func (t *TaskConsoleSupportingServiceResource) Reconcile(client *client.Client, instance *v1beta1.KogitoSupportingService, scheme *runtime.Scheme) (reconcileAfter time.Duration, err error) {
+func (t *taskConsoleSupportingServiceResource) Reconcile(client *client.Client, instance *v1beta1.KogitoSupportingService, scheme *runtime.Scheme) (reconcileAfter time.Duration, err error) {
 	t.log.Info("Reconciling for", "KogitoTaskConsole", instance.Name, "in Namespace", instance.Namespace)
 	definition := services.ServiceDefinition{
 		DefaultImageName:   infrastructure.DefaultTaskConsoleImageName,
