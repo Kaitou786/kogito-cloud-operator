@@ -16,17 +16,16 @@ package service
 
 import (
 	"fmt"
+	"github.com/kiegroup/kogito-cloud-operator/api/v1beta1"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/context"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/converter"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/flag"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/message"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/shared"
-	"github.com/kiegroup/kogito-cloud-operator/pkg/apis/app/v1beta1"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/client"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/client/kubernetes"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/client/openshift"
 	buildv1 "github.com/openshift/api/build/v1"
-	"go.uber.org/zap"
 	"io"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -53,7 +52,7 @@ func NewBuildService(cli *client.Client) BuildService {
 // InstallBuildService install Kogito build service
 func (i buildService) InstallBuildService(flags *flag.BuildFlags, resource string) (err error) {
 	log := context.GetDefaultLogger()
-	log.Debugf("Installing Kogito build : %s", flags.Name)
+	log.Debug("Installing", "Kogito build", flags.Name)
 
 	if err = i.validatePreRequisite(flags, log); err != nil {
 		return err
@@ -104,7 +103,7 @@ func (i buildService) InstallBuildService(flags *flag.BuildFlags, resource strin
 		},
 	}
 
-	log.Debugf("Trying to build Kogito Service '%s'", kogitoBuild.Name)
+	log.Debug("Trying to build", "Kogito Service", kogitoBuild.Name)
 
 	// Create the Kogito application
 	err = shared.
@@ -124,14 +123,13 @@ func (i buildService) InstallBuildService(flags *flag.BuildFlags, resource strin
 	return nil
 }
 
-func (i buildService) validatePreRequisite(flags *flag.BuildFlags, log *zap.SugaredLogger) error {
+func (i buildService) validatePreRequisite(flags *flag.BuildFlags, log context.Logger) error {
 
 	if !i.client.IsOpenshift() {
 		log.Info("Kogito Build is only supported on Openshift.")
 		return fmt.Errorf("kogito build only supported on Openshift. Provide image flag to deploy Kogito service on K8s")
 	}
 
-	// TODO: refactor all of this "services" to carry a context of shared objects
 	if err := i.resourceCheckService.CheckKogitoBuildNotExists(i.client, flags.Name, flags.Project); err != nil {
 		return err
 	}
@@ -155,7 +153,7 @@ func (i buildService) DeleteBuildService(name, project string) (err error) {
 	if err := i.resourceCheckService.CheckKogitoBuildExists(i.client, name, project); err != nil {
 		return err
 	}
-	log.Debugf("About to delete build %s in namespace %s", name, project)
+	log.Debug("About to delete", "build", name, "namespace", project)
 	if err := kubernetes.ResourceC(i.client).Delete(&v1beta1.KogitoBuild{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      name,
@@ -164,7 +162,7 @@ func (i buildService) DeleteBuildService(name, project string) (err error) {
 	}); err != nil {
 		return err
 	}
-	log.Infof("Successfully deleted Kogito Build %s in the Project %s", name, project)
+	log.Info("Successfully deleted", "Kogito Build", name, "project", project)
 	return nil
 }
 
@@ -192,8 +190,8 @@ func (i buildService) createBuildIfRequires(name, namespace, resource string, re
 
 func (i buildService) handleGitRepositoryBuild(name, namespace string) {
 	log := context.GetDefaultLogger()
-	log.Infof(message.KogitoBuildViewDeploymentStatus, name, namespace)
-	log.Infof(message.KogitoViewBuildStatus, name, namespace)
+	log.Info(fmt.Sprintf(message.KogitoBuildViewDeploymentStatus, name, namespace))
+	log.Info(fmt.Sprintf(message.KogitoViewBuildStatus, name, namespace))
 }
 
 func (i buildService) handleGitFileResourceBuild(name, namespace, resource string) error {
@@ -237,7 +235,7 @@ func (i buildService) handleLocalFileResourceBuild(name, namespace, resource str
 
 func (i buildService) handleBinaryResourceBuild(name, namespace string) {
 	log := context.GetDefaultLogger()
-	log.Infof(message.KogitoBuildUploadBinariesInstruction, name, namespace)
+	log.Info(fmt.Sprintf(message.KogitoBuildUploadBinariesInstruction, name, namespace))
 }
 
 func (i buildService) triggerBuild(name string, namespace string, fileReader io.Reader, fileName string, binaryBuild bool) error {
@@ -255,9 +253,9 @@ func (i buildService) triggerBuild(name string, namespace string, fileReader io.
 	}
 
 	if binaryBuild {
-		log.Infof(message.KogitoBuildSuccessfullyUploadedBinaries, build.Name, name, namespace)
+		log.Info(fmt.Sprintf(message.KogitoBuildSuccessfullyUploadedBinaries, build.Name, name, namespace))
 	} else {
-		log.Infof(message.KogitoBuildSuccessfullyUploadedFile, build.Name, name, namespace)
+		log.Info(fmt.Sprintf(message.KogitoBuildSuccessfullyUploadedFile, build.Name, name, namespace))
 	}
 	return nil
 }

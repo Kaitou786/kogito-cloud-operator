@@ -16,8 +16,6 @@ package project
 
 import (
 	"fmt"
-	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/flag"
-
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/context"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/message"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/shared"
@@ -64,14 +62,12 @@ func (i *useProjectCommand) RegisterHook() {
 					if len(namespace) == 0 {
 						return fmt.Errorf(message.ProjectCantIdentifyContext)
 					}
-					log.Debugf(message.ProjectCurrentContextInfo, namespace)
+					log.Debug("Current Context", "Namespace", namespace)
+					log.Debug(message.ProjectCurrentContextInfo)
 					i.flags.project = namespace
 					return nil
 				}
 				i.flags.project = args[0]
-			}
-			if err := flag.CheckOperatorArgs(&i.flags.OperatorFlags); err != nil {
-				return err
 			}
 			return nil
 		},
@@ -79,9 +75,7 @@ func (i *useProjectCommand) RegisterHook() {
 }
 
 func (i *useProjectCommand) InitHook() {
-	i.flags = projectFlags{
-		OperatorFlags: flag.OperatorFlags{},
-	}
+	i.flags = projectFlags{}
 	i.Parent.AddCommand(i.command)
 	addProjectFlagsToCommand(i.command, &i.flags)
 }
@@ -95,7 +89,7 @@ func (i *useProjectCommand) Exec(cmd *cobra.Command, args []string) error {
 			return err
 		}
 
-		log.Infof(message.ProjectSet, i.flags.project)
+		log.Info(message.ProjectSet, "Project", i.flags.project)
 
 		return handleServicesInstallation(&i.flags, i.Client)
 	}

@@ -16,18 +16,16 @@ package install
 
 import (
 	"fmt"
-
+	"github.com/kiegroup/kogito-cloud-operator/api/v1beta1"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/context"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/converter"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/flag"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/shared"
-	"github.com/kiegroup/kogito-cloud-operator/pkg/apis/app/v1beta1"
 	"github.com/spf13/cobra"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type infraFlags struct {
-	flag.OperatorFlags
 	flag.InfraResourceFlags
 	flag.PropertiesFlag
 	Name    string
@@ -84,9 +82,6 @@ func (i *infraCommand) RegisterHook() {
 			if len(args) == 0 {
 				return fmt.Errorf("the kogito infra service requires a name ")
 			}
-			if err := flag.CheckOperatorArgs(&i.flags.OperatorFlags); err != nil {
-				return err
-			}
 			if err := flag.CheckInfraResourceArgs(&i.flags.InfraResourceFlags); err != nil {
 				return err
 			}
@@ -101,7 +96,6 @@ func (i *infraCommand) RegisterHook() {
 func (i *infraCommand) InitHook() {
 	i.Parent.AddCommand(i.command)
 	i.flags = &infraFlags{}
-	flag.AddOperatorFlags(i.command, &i.flags.OperatorFlags)
 	flag.AddInfraResourceFlags(i.command, &i.flags.InfraResourceFlags)
 	flag.AddPropertiesFlags(i.command, &i.flags.PropertiesFlag)
 	i.command.Flags().StringVarP(&i.flags.Project, "project", "p", "", "The project name where the service will be deployed")
@@ -109,7 +103,7 @@ func (i *infraCommand) InitHook() {
 
 func (i *infraCommand) Exec(cmd *cobra.Command, args []string) (err error) {
 	log := context.GetDefaultLogger()
-	log.Debugf("Installing Kogito Infra : %s", i.flags.Name)
+	log.Debug("Installing Kogito Infra", "name", i.flags.Name)
 
 	if i.flags.Project, err = i.resourceCheckService.EnsureProject(i.Client, i.flags.Project); err != nil {
 		return err
@@ -129,7 +123,7 @@ func (i *infraCommand) Exec(cmd *cobra.Command, args []string) (err error) {
 		},
 	}
 
-	log.Debugf("Trying to install Kogito Infra Service '%s'", kogitoInfra.Name)
+	log.Debug("Trying to install Kogito Infra Service", "name", kogitoInfra.Name)
 
 	// Create the Kogito infra application
 	return shared.

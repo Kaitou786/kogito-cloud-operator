@@ -16,13 +16,13 @@ package message
 
 const (
 	// ProjectUsingProject format in: project name
-	ProjectUsingProject = "Using project '%s'"
+	ProjectUsingProject = "Using project"
 	// ProjectNoProjectConfigured ...
 	ProjectNoProjectConfigured = "No project configured yet..."
 	// ProjectErrorGetProject ...
 	ProjectErrorGetProject = "Error while trying to look for the project. Are you logged in? %s "
 	// ProjectSet format in: project name
-	ProjectSet = "Project set to '%s'"
+	ProjectSet = "Set to"
 	// ProjectNotFound in: project name, project name
 	ProjectNotFound = "Project '%s' not found. Try running 'kogito new-project %s' to create your Project first "
 	// ProjectNoContext ...
@@ -30,11 +30,11 @@ const (
 	// ProjectCantIdentifyContext ...
 	ProjectCantIdentifyContext = "Can't identify the current context "
 	// ProjectCurrentContextInfo in: current context
-	ProjectCurrentContextInfo = "Project in the context is '%s'. Use 'kogito deploy-service NAME SOURCE' to deploy a new Kogito Service."
+	ProjectCurrentContextInfo = "Use 'kogito deploy-service NAME SOURCE' to deploy a new Kogito Service."
 	// ProjectAlreadyExists in: project's name
-	ProjectAlreadyExists = "Project '%s' already exists"
+	ProjectAlreadyExists = "Already exists"
 	// ProjectCreatedSuccessfully in: project's name
-	ProjectCreatedSuccessfully = "Project '%s' created successfully"
+	ProjectCreatedSuccessfully = "Successfully created"
 	// ProjectCurrentContext --project / -p
 	ProjectCurrentContext = "The project to be used in the current context"
 	// InstallDataIndex --install-data-index
@@ -46,6 +46,4 @@ For a more customized Jobs Service installation, use 'kogito install jobs-servic
 	// InstallMgmtConsole --install-mgmt-console
 	InstallMgmtConsole = `Installs the default instance of Jobs Service being provisioned by the Kogito Operator in the project.
 For a more customized Jobs Service installation, use 'kogito install jobs-service [OPTIONS]'`
-	// Namespaced --namespaced
-	Namespaced = `Installs the operator in the target namespace. Defaults to false`
 )

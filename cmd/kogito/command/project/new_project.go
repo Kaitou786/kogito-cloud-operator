@@ -16,8 +16,6 @@ package project
 
 import (
 	"fmt"
-	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/flag"
-
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/context"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/message"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/shared"
@@ -63,18 +61,13 @@ func (i *newProjectCommand) RegisterHook() {
 				}
 				i.flags.project = args[0]
 			}
-			if err := flag.CheckOperatorArgs(&i.flags.OperatorFlags); err != nil {
-				return err
-			}
 			return nil
 		},
 	}
 }
 
 func (i *newProjectCommand) InitHook() {
-	i.flags = projectFlags{
-		OperatorFlags: flag.OperatorFlags{},
-	}
+	i.flags = projectFlags{}
 	i.Parent.AddCommand(i.command)
 	addProjectFlagsToCommand(i.command, &i.flags)
 }
@@ -95,11 +88,11 @@ func (i *newProjectCommand) Exec(cmd *cobra.Command, args []string) error {
 			return err
 		}
 
-		log.Infof(message.ProjectCreatedSuccessfully, ns.Name)
+		log.Info(message.ProjectCreatedSuccessfully, "Project", ns.Name)
 
 		return handleServicesInstallation(&i.flags, i.Client)
 	}
 
-	log.Infof(message.ProjectAlreadyExists, i.flags.project)
+	log.Info(message.ProjectAlreadyExists, "Project", i.flags.project)
 	return nil
 }

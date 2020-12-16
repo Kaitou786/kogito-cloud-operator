@@ -15,10 +15,9 @@
 package converter
 
 import (
-	"testing"
-
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/flag"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func Test_FromResourceFlagsToResource(t *testing.T) {

@@ -28,5 +28,5 @@ var (
 For how to install see: https://docs.jboss.org/kogito/release/latest/html_single/#con-kogito-operator-with-data-index-service_kogito-deploying-on-openshift
 and https://docs.jboss.org/kogito/release/latest/html_single/#con-management-console_kogito-developing-process-services`
 	// RuntimeServiceMgmtConsoleEndpoint ...
-	RuntimeServiceMgmtConsoleEndpoint = `You can manage your process using the management console: %s`
+	RuntimeServiceMgmtConsoleEndpoint = `You can manage your process using`
 )

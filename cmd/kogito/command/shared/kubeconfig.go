@@ -27,10 +27,12 @@ const (
 	kubeConfigContextSep = "/"
 )
 
+var log = context.GetDefaultLogger()
+
 func getCurrentNamespaceFromKubeConfig(filename string) string {
 	config := clientcmd.GetConfigFromFileOrDie(filename)
 	if len(config.CurrentContext) == 0 || config.Contexts[config.CurrentContext] == nil {
-		context.GetDefaultLogger().Warnf(message.KubeConfigNoContext, filename)
+		log.Warn(fmt.Sprintf(message.KubeConfigNoContext, filename))
 		return ""
 	}
 	return config.Contexts[config.CurrentContext].Namespace
@@ -61,7 +63,7 @@ func setCurrentNamespaceToKubeConfig(filename, namespace string) error {
 	if err := clientcmd.WriteToFile(*config, filename); err != nil {
 		return fmt.Errorf(message.KubeConfigErrorWriteFile, filename, err)
 	}
-	context.GetDefaultLogger().Debugf("Successfully set current namespace to %s", namespace)
+	log.Debug("Successfully set current context to", "namespace", namespace)
 	return nil
 }
 
