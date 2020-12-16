@@ -31,9 +31,9 @@ limitations under the License.
 package controllers
 
 import (
+	"github.com/kiegroup/kogito-cloud-operator/api/v1beta1"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/client"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/client/kubernetes"
-	"github.com/kiegroup/kogito-cloud-operator/pkg/framework"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/infrastructure"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/infrastructure/services"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/logger"
@@ -43,13 +43,9 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/controller"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/event"
-	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	"sigs.k8s.io/controller-runtime/pkg/source"
-
-	"github.com/kiegroup/kogito-cloud-operator/api/v1beta1"
 )
 
 // KogitoRuntimeReconciler reconciles a KogitoRuntime object
@@ -118,11 +114,6 @@ func (r *KogitoRuntimeReconciler) Reconcile(req ctrl.Request) (result ctrl.Resul
 // SetupWithManager registers the controller with manager
 func (r *KogitoRuntimeReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	r.Log.Debug("Adding watched objects for KogitoRuntime controller")
-	// Create a new controller
-	c, err := controller.New("kogitoruntime-controller", mgr, controller.Options{Reconciler: r})
-	if err != nil {
-		return err
-	}
 
 	pred := predicate.Funcs{
 		// Don't watch delete events as the resource removals will be handled by its finalizer
@@ -133,31 +124,15 @@ func (r *KogitoRuntimeReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			return e.MetaNew.GetDeletionTimestamp().IsZero()
 		},
 	}
-	err = c.Watch(&source.Kind{Type: &v1beta1.KogitoRuntime{}}, &handler.EnqueueRequestForObject{}, pred)
-	if err != nil {
-		return err
+	b := ctrl.NewControllerManagedBy(mgr).
+		For(&v1beta1.KogitoRuntime{}, builder.WithPredicates(pred)).
+		Owns(&corev1.Service{}).Owns(&appsv1.Deployment{}).Owns(&corev1.ConfigMap{})
+
+	if r.IsOpenshift() {
+		b.Owns(&routev1.Route{}).Owns(&imagev1.ImageStream{})
 	}
 
-	watchedObjects := []framework.WatchedObjects{
-		{
-			GroupVersion: routev1.GroupVersion,
-			AddToScheme:  routev1.Install,
-			Objects:      []runtime.Object{&routev1.Route{}},
-		},
-		{
-			GroupVersion: imagev1.GroupVersion,
-			AddToScheme:  imagev1.Install,
-			Objects:      []runtime.Object{&imagev1.ImageStream{}},
-		},
-		{
-			Objects: []runtime.Object{&corev1.Service{}, &appsv1.Deployment{}, &corev1.ConfigMap{}},
-		},
-	}
-	controllerWatcher := framework.NewControllerWatcher(r.Client, mgr, c, &v1beta1.KogitoRuntime{})
-	if err = controllerWatcher.Watch(watchedObjects...); err != nil {
-		return err
-	}
-	return nil
+	return b.Complete(r)
 }
 
 func (r *KogitoRuntimeReconciler) setupRBAC(namespace string) (err error) {

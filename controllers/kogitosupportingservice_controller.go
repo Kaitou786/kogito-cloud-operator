@@ -33,18 +33,15 @@ package controllers
 import (
 	"fmt"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/client/kubernetes"
-	"github.com/kiegroup/kogito-cloud-operator/pkg/framework"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/infrastructure"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/logger"
 	imgv1 "github.com/openshift/api/image/v1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"reflect"
-	"sigs.k8s.io/controller-runtime/pkg/controller"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/event"
-	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 	"time"
 
 	"github.com/kiegroup/kogito-cloud-operator/pkg/client"
@@ -119,11 +116,6 @@ func (r *KogitoSupportingServiceReconciler) Reconcile(req ctrl.Request) (result 
 // SetupWithManager registers the controller with manager
 func (r *KogitoSupportingServiceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	r.Log.Info("Adding watched objects for KogitoSupportingService controller")
-	// Create a new controller
-	c, err := controller.New("kogitosupportingservice-controller", mgr, controller.Options{Reconciler: r})
-	if err != nil {
-		return err
-	}
 
 	pred := predicate.Funcs{
 		// Don't watch delete events as the resource removals will be handled by its finalizer
@@ -134,38 +126,22 @@ func (r *KogitoSupportingServiceReconciler) SetupWithManager(mgr ctrl.Manager) e
 			return e.MetaNew.GetDeletionTimestamp().IsZero()
 		},
 	}
-	err = c.Watch(&source.Kind{Type: &appv1beta1.KogitoSupportingService{}}, &handler.EnqueueRequestForObject{}, pred)
-	if err != nil {
-		return err
-	}
 
-	controllerWatcher := framework.NewControllerWatcher(r.Client, mgr, c, &appv1beta1.KogitoSupportingService{})
-	watchedObjects := []framework.WatchedObjects{
-		{
-			GroupVersion: routev1.GroupVersion,
-			AddToScheme:  routev1.Install,
-			Objects:      []runtime.Object{&routev1.Route{}},
+	b := ctrl.NewControllerManagedBy(mgr).
+		For(&appv1beta1.KogitoSupportingService{}, builder.WithPredicates(pred)).
+		Owns(&corev1.Service{}).Owns(&appsv1.Deployment{}).Owns(&corev1.ConfigMap{})
+
+	infraPredicate := predicate.Funcs{
+		UpdateFunc: func(e event.UpdateEvent) bool {
+			return isKogitoInfraUpdated(e.ObjectOld.(*appv1beta1.KogitoInfra), e.ObjectNew.(*appv1beta1.KogitoInfra))
 		},
-		{
-			GroupVersion: imgv1.GroupVersion,
-			AddToScheme:  imgv1.Install,
-			Objects:      []runtime.Object{&imgv1.ImageStream{}},
-		},
-		{
-			Objects:      []runtime.Object{&appv1beta1.KogitoInfra{}},
-			EventHandler: &handler.EnqueueRequestForOwner{IsController: false, OwnerType: &appv1beta1.KogitoSupportingService{}},
-			Predicate: predicate.Funcs{
-				UpdateFunc: func(e event.UpdateEvent) bool {
-					return isKogitoInfraUpdated(e.ObjectOld.(*appv1beta1.KogitoInfra), e.ObjectNew.(*appv1beta1.KogitoInfra))
-				},
-			},
-		},
-		{Objects: []runtime.Object{&corev1.Service{}, &appsv1.Deployment{}, &corev1.ConfigMap{}}},
 	}
-	if err = controllerWatcher.Watch(watchedObjects...); err != nil {
-		return err
+	b.Owns(&appv1beta1.KogitoInfra{}, builder.WithPredicates(infraPredicate))
+
+	if r.IsOpenshift() {
+		b.Owns(&routev1.Route{}).Owns(&imgv1.ImageStream{})
 	}
-	return nil
+	return b.Complete(r)
 }
 
 // fetches all the supported services managed by kogitoSupportingService controller

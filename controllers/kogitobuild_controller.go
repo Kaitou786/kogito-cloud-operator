@@ -35,15 +35,11 @@ import (
 	"github.com/RHsyseng/operator-utils/pkg/resource"
 	"github.com/kiegroup/kogito-cloud-operator/controllers/build"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/client/kubernetes"
-	"github.com/kiegroup/kogito-cloud-operator/pkg/framework"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/logger"
 	buildv1 "github.com/openshift/api/build/v1"
 	imagev1 "github.com/openshift/api/image/v1"
 	"reflect"
-	"sigs.k8s.io/controller-runtime/pkg/controller"
-	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 	"time"
 
 	"github.com/kiegroup/kogito-cloud-operator/pkg/client"
@@ -163,35 +159,11 @@ func (r *KogitoBuildReconciler) Reconcile(req ctrl.Request) (result ctrl.Result,
 // SetupWithManager registers the controller with manager
 func (r *KogitoBuildReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	r.Log.Debug("Adding watched objects for KogitoBuild controller")
-	// Create a new controller
-	c, err := controller.New("kogitobuild-controller", mgr, controller.Options{Reconciler: r})
-	if err != nil {
-		return err
+	b := ctrl.NewControllerManagedBy(mgr).For(&appv1beta1.KogitoBuild{})
+	if r.IsOpenshift() {
+		b.Owns(&buildv1.BuildConfig{}).Owns(&imagev1.ImageStream{})
 	}
-
-	// Watch for changes to primary resource KogitoBuild
-	err = c.Watch(&source.Kind{Type: &appv1beta1.KogitoBuild{}}, &handler.EnqueueRequestForObject{})
-	if err != nil {
-		return err
-	}
-
-	watchedObjects := []framework.WatchedObjects{
-		{
-			GroupVersion: buildv1.GroupVersion,
-			AddToScheme:  buildv1.Install,
-			Objects:      []runtime.Object{&buildv1.BuildConfig{}},
-		},
-		{
-			GroupVersion: imagev1.GroupVersion,
-			AddToScheme:  imagev1.Install,
-			Objects:      []runtime.Object{&imagev1.ImageStream{}},
-		},
-	}
-	controllerWatcher := framework.NewControllerWatcher(r.Client, mgr, c, &appv1beta1.KogitoBuild{})
-	if err = controllerWatcher.Watch(watchedObjects...); err != nil {
-		return err
-	}
-	return nil
+	return b.Complete(r)
 }
 
 // onResourceChange triggers hooks when a resource is changed
