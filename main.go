@@ -113,7 +113,7 @@ func main() {
 		Log:    logger.GetLogger("KogitoSupportingService-finalizer"),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "KogitoInfra")
+		setupLog.Error(err, "unable to create controller", "controller", "KogitoSupportingService-finalizer")
 		os.Exit(1)
 	}
 	if err = (&controllers.FinalizeKogitoRuntime{
@@ -121,7 +121,7 @@ func main() {
 		Log:    logger.GetLogger("KogitoRuntime-finalizer"),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "KogitoInfra")
+		setupLog.Error(err, "unable to create controller", "controller", "KogitoRuntime-finalizer")
 		os.Exit(1)
 	}
 	// +kubebuilder:scaffold:builder
