@@ -81,12 +81,12 @@ func (i *deleteProjectCommand) Exec(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	log.Debug("About to delete", "Project", i.flags.name)
+	log.Debugf("About to delete project %s", i.flags.name)
 	if err := kubernetes.ResourceC(i.Client).Delete(&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: i.flags.name}}); err != nil {
 		return err
 	}
 
-	log.Info("Successfully deleted", "Project", i.flags.name)
+	log.Infof("Successfully deleted Kogito Project %s", i.flags.name)
 
 	return nil
 }

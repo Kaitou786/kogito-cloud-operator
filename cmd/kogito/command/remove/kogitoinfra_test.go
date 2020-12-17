@@ -35,7 +35,7 @@ func Test_DeleteKogitoInfraCmd_SuccessfullyDelete(t *testing.T) {
 
 	lines, _, err := test.ExecuteCli()
 	assert.NoError(t, err)
-	assert.Contains(t, lines, "Successfully deleted")
+	assert.Contains(t, lines, "Successfully deleted Kogito Infra Service kafka-infra")
 }
 
 func Test_DeleteKogitoInfraCmd_Failure_ServiceDoesNotExist(t *testing.T) {

@@ -48,7 +48,7 @@ func NewRuntimeService() RuntimeService {
 // InstallRuntimeService install Kogito runtime service
 func (i runtimeService) InstallRuntimeService(cli *client.Client, flags *flag.RuntimeFlags) (err error) {
 	log := context.GetDefaultLogger()
-	log.Debug("Installing", "Kogito Runtime", flags.Name)
+	log.Debugf("Installing Kogito Runtime : %s", flags.Name)
 	if err := i.resourceCheckService.CheckKogitoRuntimeNotExists(cli, flags.Name, flags.Project); err != nil {
 		return err
 	}
@@ -85,7 +85,7 @@ func (i runtimeService) InstallRuntimeService(cli *client.Client, flags *flag.Ru
 		},
 	}
 
-	log.Debug("Trying to deploy", "Kogito Service", kogitoRuntime.Name)
+	log.Debugf("Trying to deploy Kogito Service '%s'", kogitoRuntime.Name)
 	// Create the Kogito application
 	err = shared.
 		ServicesInstallationBuilder(cli, flags.Project).
@@ -110,7 +110,7 @@ func printMgmtConsoleInfo(client *client.Client, project string) error {
 	if endpoint == nil {
 		log.Info(message.RuntimeServiceMgmtConsole)
 	} else {
-		log.Info(message.RuntimeServiceMgmtConsoleEndpoint, "management console", endpoint.HTTPRouteURI)
+		log.Infof(message.RuntimeServiceMgmtConsoleEndpoint, endpoint.HTTPRouteURI)
 	}
 	return nil
 }
@@ -121,7 +121,7 @@ func (i runtimeService) DeleteRuntimeService(cli *client.Client, name, project s
 	if err := i.resourceCheckService.CheckKogitoRuntimeExists(cli, name, project); err != nil {
 		return err
 	}
-	log.Debug("About to delete", "service", name, "namespace", project)
+	log.Debugf("About to delete service %s in namespace %s", name, project)
 	if err := kubernetes.ResourceC(cli).Delete(&v1beta1.KogitoRuntime{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      name,
@@ -130,6 +130,6 @@ func (i runtimeService) DeleteRuntimeService(cli *client.Client, name, project s
 	}); err != nil {
 		return err
 	}
-	log.Info("Successfully deleted", "Kogito Service", name, "project", project)
+	log.Infof("Successfully deleted Kogito Service %s in the Project %s", name, project)
 	return nil
 }

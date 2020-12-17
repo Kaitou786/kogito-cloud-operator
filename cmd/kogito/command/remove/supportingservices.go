@@ -135,14 +135,14 @@ func (r *removeSupportingServiceCommand) Exec(cmd *cobra.Command, args []string)
 	}
 
 	if len(targetServiceItems) == 0 {
-		log.Warn("There's no", "service", r.supportingService.cmdName, "namespace", r.flags.namespace)
+		log.Warnf("There's no service %s in the namespace %s", r.supportingService.cmdName, r.flags.namespace)
 		return nil
 	}
 	for _, targetService := range targetServiceItems {
 		if err = kubernetes.ResourceC(r.Client).Delete(&targetService); err != nil {
 			return fmt.Errorf("error occurs while delete Service %s from namespace %s. Error %s", r.supportingService.cmdName, targetService.Name, err)
 		}
-		log.Info("Successfully removed", "service", targetService.Name, "service type", r.supportingService.cmdName, "namespace", targetService.Namespace)
+		log.Infof("Service %s named %s from namespace %s has been successfully removed", r.supportingService.cmdName, targetService.Name, targetService.Namespace)
 	}
 	return nil
 }

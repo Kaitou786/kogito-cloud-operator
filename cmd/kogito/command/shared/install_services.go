@@ -166,8 +166,8 @@ func (s *servicesInstallation) installKogitoService(resource meta.ResourceObject
 		if err := kubernetes.ResourceC(s.client).Create(resource); err != nil {
 			return fmt.Errorf(messages.errCreating, err)
 		}
-		log.Info(fmt.Sprintf(messages.installed, s.namespace))
-		log.Info(fmt.Sprintf(messages.checkStatus, resource.GetName(), s.namespace))
+		log.Infof(messages.installed, s.namespace)
+		log.Infof(messages.checkStatus, resource.GetName(), s.namespace)
 	}
 	return nil
 }

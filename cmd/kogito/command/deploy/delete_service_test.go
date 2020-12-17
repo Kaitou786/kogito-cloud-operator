@@ -35,7 +35,7 @@ func Test_DeleteServiceCmd_SuccessfullyDelete(t *testing.T) {
 
 	lines, _, err := test.ExecuteCli()
 	assert.NoError(t, err)
-	assert.Contains(t, lines, "Successfully deleted")
+	assert.Contains(t, lines, "Successfully deleted Kogito Service example-drools")
 }
 
 func Test_DeleteServiceCmd_Failure_ServiceDoesNotExist(t *testing.T) {

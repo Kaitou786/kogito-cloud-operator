@@ -62,8 +62,7 @@ func (i *useProjectCommand) RegisterHook() {
 					if len(namespace) == 0 {
 						return fmt.Errorf(message.ProjectCantIdentifyContext)
 					}
-					log.Debug("Current Context", "Namespace", namespace)
-					log.Debug(message.ProjectCurrentContextInfo)
+					log.Debugf(message.ProjectCurrentContextInfo, namespace)
 					i.flags.project = namespace
 					return nil
 				}
@@ -89,7 +88,7 @@ func (i *useProjectCommand) Exec(cmd *cobra.Command, args []string) error {
 			return err
 		}
 
-		log.Info(message.ProjectSet, "Project", i.flags.project)
+		log.Infof(message.ProjectSet, i.flags.project)
 
 		return handleServicesInstallation(&i.flags, i.Client)
 	}

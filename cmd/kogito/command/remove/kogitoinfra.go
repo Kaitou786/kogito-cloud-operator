@@ -85,7 +85,7 @@ func (i *deleteKogitoInfraServiceCommand) Exec(cmd *cobra.Command, args []string
 	if err := i.resourceCheckService.CheckKogitoInfraExists(i.Client, i.flags.name, i.flags.project); err != nil {
 		return err
 	}
-	log.Debug("About to delete", "Kogito Infra", i.flags.name, "Namespace", i.flags.project)
+	log.Debugf("About to delete infra service %s in namespace %s", i.flags.name, i.flags.project)
 	if err := kubernetes.ResourceC(i.Client).Delete(&v1beta1.KogitoInfra{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      i.flags.name,
@@ -94,6 +94,6 @@ func (i *deleteKogitoInfraServiceCommand) Exec(cmd *cobra.Command, args []string
 	}); err != nil {
 		return err
 	}
-	log.Info("Successfully deleted", "kogito Infra", i.flags.name, "namespace", i.flags.project)
+	log.Infof("Successfully deleted Kogito Infra Service %s in the Project %s", i.flags.name, i.flags.project)
 	return nil
 }

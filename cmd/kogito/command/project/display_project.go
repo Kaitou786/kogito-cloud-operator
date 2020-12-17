@@ -68,7 +68,7 @@ func (i *displayProjectCommand) Exec(cmd *cobra.Command, args []string) error {
 	log := context.GetDefaultLogger()
 	currentProject := shared.GetCurrentNamespaceFromKubeConfig()
 	if len(currentProject) > 0 {
-		log.Info(message.ProjectUsingProject, "Project", currentProject)
+		log.Infof(message.ProjectUsingProject, currentProject)
 	} else {
 		log.Info(message.ProjectNoProjectConfigured)
 	}

@@ -88,11 +88,11 @@ func (i *newProjectCommand) Exec(cmd *cobra.Command, args []string) error {
 			return err
 		}
 
-		log.Info(message.ProjectCreatedSuccessfully, "Project", ns.Name)
+		log.Infof(message.ProjectCreatedSuccessfully, ns.Name)
 
 		return handleServicesInstallation(&i.flags, i.Client)
 	}
 
-	log.Info(message.ProjectAlreadyExists, "Project", i.flags.project)
+	log.Infof(message.ProjectAlreadyExists, i.flags.project)
 	return nil
 }

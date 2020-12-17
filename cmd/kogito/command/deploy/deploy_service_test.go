@@ -156,7 +156,7 @@ func Test_DeployCmd_SWFile(t *testing.T) {
 	lines, _, err := test.ExecuteCli()
 	assert.Error(t, err)
 	assert.Contains(t, lines, "Kogito Build Service successfully installed in the Project")
-	assert.Contains(t, lines, "File(s) found\t{\"File\": \"testdata/greetings.sw.json\"}")
+	assert.Contains(t, lines, "File(s) found: testdata/greetings.sw.json")
 	assert.Contains(t, lines, "Triggering the new build")
 	// error from fake build is ok, we don't have a server to upload the binaries here.
 	assert.Contains(t, lines, "v1.BinaryBuildRequestOptions is not suitable for converting")

@@ -16,7 +16,6 @@ package context
 
 import (
 	"github.com/go-logr/logr"
-	"github.com/go-logr/zapr"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/util"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -31,8 +30,44 @@ var (
 	commandOutput io.Writer
 	outputFormat  string
 	logVerbose    bool
+)
+
+// GetDefaultLogger retrieves the default logger
+func GetDefaultLogger() *zap.SugaredLogger {
+	return getDefaultLoggerWithOut(logVerbose, outputFormat, commandOutput)
+}
+
+// GetDefaultLoggerWithOut returns a logger set to a given output
+func getDefaultLoggerWithOut(verbose bool, outputFormat string, commandOutput io.Writer) *zap.SugaredLogger {
+	var badOutputFormatMsg string
+	if len(outputFormat) > 0 && outputFormat != "json" {
+		badOutputFormatMsg = "'" + outputFormat + "' is not a supported output format"
+		outputFormat = ""
+	}
+	if commandOutput == nil {
+		commandOutput = os.Stdout
+	}
+	log := GetLoggerWithOptions("kogito-cli", &Opts{
+		Output:       commandOutput,
+		OutputFormat: outputFormat,
+		Verbose:      verbose,
+		Console:      true,
+	})
+	if len(badOutputFormatMsg) > 0 {
+		log.Warn(badOutputFormatMsg)
+	}
+	return log
+}
+
+var (
 	defaultOutput = os.Stdout
 )
+
+// Logger shared logger struct
+type Logger struct {
+	Logger        logr.Logger
+	SugaredLogger *zap.SugaredLogger
+}
 
 // Opts describe logger options
 type Opts struct {
@@ -46,50 +81,8 @@ type Opts struct {
 	Console bool
 }
 
-// Logger shared logger struct
-type Logger struct {
-	logr.Logger
-}
-
-// Debug alternative for info format with DEBUG named and correct log level
-func (l *Logger) Debug(message string, keysAndValues ...interface{}) {
-	l.Logger.WithName("DEBUG").V(1).Info(message, keysAndValues...)
-}
-
-// Warn alternative for info format with sprintf and WARN named.
-func (l *Logger) Warn(message string, keysAndValues ...interface{}) {
-	l.Logger.WithName("WARNING").V(0).Info(message, keysAndValues...)
-}
-
-// GetDefaultLogger retrieves the default logger
-func GetDefaultLogger() Logger {
-	return getDefaultLoggerWithOut(logVerbose, outputFormat, commandOutput)
-}
-
-// GetDefaultLoggerWithOut returns a logger set to a given output
-func getDefaultLoggerWithOut(verbose bool, outputFormat string, commandOutput io.Writer) Logger {
-	var badOutputFormatMsg string
-	if len(outputFormat) > 0 && outputFormat != "json" {
-		badOutputFormatMsg = "'" + outputFormat + "' is not a supported output format"
-		outputFormat = ""
-	}
-	if commandOutput == nil {
-		commandOutput = os.Stdout
-	}
-	log := getLoggerWithOptions("kogito-cli", &Opts{
-		Output:       commandOutput,
-		OutputFormat: outputFormat,
-		Verbose:      verbose,
-		Console:      true,
-	})
-	if len(badOutputFormatMsg) > 0 {
-		log.Warn(badOutputFormatMsg)
-	}
-	return log
-}
-
-// getLoggerWithOptions returns a custom named logger with given options
-func getLoggerWithOptions(name string, options *Opts) Logger {
+// GetLoggerWithOptions returns a custom named logger with given options
+func GetLoggerWithOptions(name string, options *Opts) *zap.SugaredLogger {
 	if options == nil {
 		options = getDefaultOpts()
 	} else if options.Output == nil {
@@ -106,7 +99,7 @@ func getDefaultOpts() *Opts {
 	}
 }
 
-func getLogger(name string, options *Opts) Logger {
+func getLogger(name string, options *Opts) *zap.SugaredLogger {
 	// Set log level... override default w/ command-line variable if set.
 	// The logger instantiated here can be changed to any logger
 	// implementing the logr.Logger interface. This logger will
@@ -114,24 +107,33 @@ func getLogger(name string, options *Opts) Logger {
 	// uniform and structured logs.
 	logger := createLogger(options)
 	//logger.Logger = logf.Log.WithName(name)
-	logger.Logger.WithName(name)
-	return logger
+	return logger.SugaredLogger.Named(name)
 }
 
 func createLogger(options *Opts) (logger Logger) {
 	log := Logger{
-		Logger: createZAPLogger(options),
+		Logger: logzap.New(func(opts *logzap.Options) {
+			opts.Development = options.Verbose
+		}),
+		SugaredLogger: zapSugaredLogger(options),
 	}
 
 	logf.SetLogger(log.Logger)
 	return log
 }
 
-// createZAPLogger is a Logger implementation.
+// zapSugaredLogger is a Logger implementation.
 // If development is true, a Zap development config will be used,
 // otherwise a Zap production config will be used
 // (stacktraces on errors, sampling).
-func createZAPLogger(options *Opts) logr.Logger {
+func zapSugaredLogger(options *Opts) *zap.SugaredLogger {
+	return zapSugaredLoggerTo(options)
+}
+
+// zapSugaredLoggerTo returns a new Logger implementation using Zap which logs
+// to the given destination, instead of stderr.  It otherise behaves like
+// ZapLogger.
+func zapSugaredLoggerTo(options *Opts) *zap.SugaredLogger {
 	// this basically mimics New<type>Config, but with a custom sink
 	sink := zapcore.AddSync(options.Output)
 
@@ -185,5 +187,6 @@ func createZAPLogger(options *Opts) logr.Logger {
 	opts = append(opts, zap.AddCallerSkip(1), zap.ErrorOutput(sink))
 	log := zap.New(zapcore.NewCore(&logzap.KubeAwareEncoder{Encoder: enc, Verbose: options.Verbose}, sink, lvl))
 	log = log.WithOptions(opts...)
-	return zapr.NewLogger(log)
+
+	return log.Sugar()
 }

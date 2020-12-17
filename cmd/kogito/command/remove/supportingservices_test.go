@@ -33,7 +33,7 @@ func Test_removeRuntimeServiceCommand_NoServiceThere(t *testing.T) {
 
 	lines, _, err := test.ExecuteCli()
 	assert.NoError(t, err)
-	assert.Contains(t, lines, "There's no\t{\"service\": \"data-index\"")
+	assert.Contains(t, lines, "There's no service data-index")
 }
 
 func Test_removeRuntimeServiceCommand_NoServiceThereWithAlias(t *testing.T) {
@@ -43,7 +43,7 @@ func Test_removeRuntimeServiceCommand_NoServiceThereWithAlias(t *testing.T) {
 
 	lines, _, err := test.ExecuteCli()
 	assert.NoError(t, err)
-	assert.Contains(t, lines, "There's no\t{\"service\": \"mgmt-console\"")
+	assert.Contains(t, lines, "There's no service mgmt-console")
 }
 
 func Test_removeRuntimeServiceCommand_SingletonService(t *testing.T) {
@@ -61,7 +61,7 @@ func Test_removeRuntimeServiceCommand_SingletonService(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotContains(t, lines, "There's no service jobs-service")
 	assert.Contains(t, lines, infrastructure.DefaultJobsServiceName)
-	assert.Contains(t, lines, "Successfully removed")
+	assert.Contains(t, lines, "has been successfully removed")
 }
 
 func Test_removeRuntimeServiceCommand_MoreThenOneService(t *testing.T) {
@@ -87,7 +87,7 @@ func Test_removeRuntimeServiceCommand_MoreThenOneService(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Contains(t, lines, infrastructure.DefaultJobsServiceName)
 	assert.Contains(t, lines, "my-job-service")
-	assert.Contains(t, lines, "Successfully removed")
+	assert.Contains(t, lines, "has been successfully removed")
 }
 
 func Test_removeRuntimeServiceCommand_DifferentService(t *testing.T) {
@@ -113,5 +113,5 @@ func Test_removeRuntimeServiceCommand_DifferentService(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Contains(t, lines, infrastructure.DefaultJobsServiceName)
 	assert.NotContains(t, lines, "data-index")
-	assert.Contains(t, lines, "Successfully removed")
+	assert.Contains(t, lines, "has been successfully removed")
 }

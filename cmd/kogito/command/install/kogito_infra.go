@@ -16,6 +16,7 @@ package install
 
 import (
 	"fmt"
+
 	"github.com/kiegroup/kogito-cloud-operator/api/v1beta1"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/context"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/converter"
@@ -103,7 +104,7 @@ func (i *infraCommand) InitHook() {
 
 func (i *infraCommand) Exec(cmd *cobra.Command, args []string) (err error) {
 	log := context.GetDefaultLogger()
-	log.Debug("Installing Kogito Infra", "name", i.flags.Name)
+	log.Debugf("Installing Kogito Infra : %s", i.flags.Name)
 
 	if i.flags.Project, err = i.resourceCheckService.EnsureProject(i.Client, i.flags.Project); err != nil {
 		return err
@@ -123,7 +124,7 @@ func (i *infraCommand) Exec(cmd *cobra.Command, args []string) (err error) {
 		},
 	}
 
-	log.Debug("Trying to install Kogito Infra Service", "name", kogitoInfra.Name)
+	log.Debugf("Trying to install Kogito Infra Service '%s'", kogitoInfra.Name)
 
 	// Create the Kogito infra application
 	return shared.

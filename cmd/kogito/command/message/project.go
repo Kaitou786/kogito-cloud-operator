@@ -16,13 +16,13 @@ package message
 
 const (
 	// ProjectUsingProject format in: project name
-	ProjectUsingProject = "Using project"
+	ProjectUsingProject = "Using project '%s'"
 	// ProjectNoProjectConfigured ...
 	ProjectNoProjectConfigured = "No project configured yet..."
 	// ProjectErrorGetProject ...
 	ProjectErrorGetProject = "Error while trying to look for the project. Are you logged in? %s "
 	// ProjectSet format in: project name
-	ProjectSet = "Set to"
+	ProjectSet = "Project set to '%s'"
 	// ProjectNotFound in: project name, project name
 	ProjectNotFound = "Project '%s' not found. Try running 'kogito new-project %s' to create your Project first "
 	// ProjectNoContext ...
@@ -30,11 +30,11 @@ const (
 	// ProjectCantIdentifyContext ...
 	ProjectCantIdentifyContext = "Can't identify the current context "
 	// ProjectCurrentContextInfo in: current context
-	ProjectCurrentContextInfo = "Use 'kogito deploy-service NAME SOURCE' to deploy a new Kogito Service."
+	ProjectCurrentContextInfo = "Project in the context is '%s'. Use 'kogito deploy-service NAME SOURCE' to deploy a new Kogito Service."
 	// ProjectAlreadyExists in: project's name
-	ProjectAlreadyExists = "Already exists"
+	ProjectAlreadyExists = "Project '%s' already exists"
 	// ProjectCreatedSuccessfully in: project's name
-	ProjectCreatedSuccessfully = "Successfully created"
+	ProjectCreatedSuccessfully = "Project '%s' created successfully"
 	// ProjectCurrentContext --project / -p
 	ProjectCurrentContext = "The project to be used in the current context"
 	// InstallDataIndex --install-data-index
