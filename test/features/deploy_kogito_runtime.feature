@@ -229,8 +229,8 @@ Feature: Deploy Kogito Runtime
     Then Service "<example-service>" contains 1 instances of process with name "orders"
 
     When Complete "Verify order" task on service "<example-service>" and process with name "orderItems" by user "john" with body:
-	  """json
-	  {}
+    """json
+    {}
     """
 
     Then Service "<example-service>" contains 0 instances of process with name "orders"
@@ -323,7 +323,7 @@ Feature: Deploy Kogito Runtime
     When Deploy <runtime> example service "<example-service>" from runtime registry with configuration:
       | config | infra | external-mongodb         |
       # Setup short name as it can create some problems with route name too long ...
-      | config | name  | process-mongodb |
+      | config | name  | process-mongodb |         
     And Kogito Runtime "process-mongodb" has 1 pods running within 10 minutes
     And Start "deals" process on service "process-mongodb" within 3 minutes with body:
       """json
@@ -338,7 +338,7 @@ Feature: Deploy Kogito Runtime
             "street" : "main street",
             "city" : "Boston",
             "zipCode" : "10005",
-            "country" : "US"
+            "country" : "US" 
           }
         }
       }
@@ -351,18 +351,18 @@ Feature: Deploy Kogito Runtime
 
     Then Service "process-mongodb" contains 1 instances of process with name "dealreviews" within 2 minutes
 
-  @springboot
+    @springboot
     Examples:
       | runtime    | example-service                        | profile |
       | springboot | process-mongodb-persistence-springboot | default |
 
-  @quarkus
+    @quarkus
     Examples:
       | runtime    | example-service                     | profile |
       | quarkus    | process-mongodb-persistence-quarkus | default |
 
-  @quarkus
-  @native
+    @quarkus
+    @native
     Examples:
       | runtime    | example-service                     | profile |
       | quarkus    | process-mongodb-persistence-quarkus | native  |
