@@ -18,10 +18,11 @@ if [[ -z ${ENVTEST_ASSETS_DIR} ]]; then
   ENVTEST_ASSETS_DIR=testbin
 fi
 
-mkdir -p $(pwd)/${ENVTEST_ASSETS_DIR}
-test -f $(pwd)/${ENVTEST_ASSETS_DIR}/setup-envtest.sh || curl -sSLo testbin/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/v0.6.3/hack/setup-envtest.sh
-sed -i "s,#\!.*,#\!\/bin\/bash,g" $(pwd)/${ENVTEST_ASSETS_DIR}/setup-envtest.sh
-source $(pwd)/${ENVTEST_ASSETS_DIR}/setup-envtest.sh; fetch_envtest_tools $(pwd)/${ENVTEST_ASSETS_DIR}; setup_envtest_env $(pwd)/${ENVTEST_ASSETS_DIR}; \
+testdir=$(pwd)/${ENVTEST_ASSETS_DIR}
+mkdir -p ${testdir}
+test -f  ${testdir}/setup-envtest.sh || curl -sSLo testbin/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/v0.6.3/hack/setup-envtest.sh
+sed -i "s,#\!.*,#\!\/bin\/bash,g"  ${testdir}/setup-envtest.sh
+source  ${testdir}/setup-envtest.sh; fetch_envtest_tools  ${testdir}; setup_envtest_env  ${testdir}; \
 go test ./cmd/... -p=1 -count=1 -coverprofile cmd-cover.out; \
 go test ./pkg/... -p=1 -count=1 -coverprofile pkg-cover.out; \
 go test ./controllers/... -p=1 -count=1 -coverprofile controllers-cover.out

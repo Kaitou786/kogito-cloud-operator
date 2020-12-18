@@ -19,8 +19,9 @@ OP_VERSION=$(grep -m 1 'Version =' ./pkg/version/version.go) && OP_VERSION=$(ech
 echo "Operator version is ${OP_VERSION}"
 
 ### Fetching the latest released kogito-cloud-operator on the OperatorHub
-rm -rf /tmp/operators/
-git clone https://github.com/operator-framework/community-operators/ /tmp/operators/
-LATEST_RELEASED_OLM_VERSION=$(cd /tmp/operators/community-operators/kogito-operator && for i in $(ls -d */); do echo ${i%%/}; done | sort -V | tail -1)
+tempfolder=$(mktemp -d)
+git clone https://github.com/operator-framework/community-operators/ "${tempfolder}"
+LATEST_RELEASED_OLM_VERSION=$(cd ${tempfolder}/community-operators/kogito-operator && for i in $(ls -d */); do echo ${i%%/}; done | sort -V | tail -1)
 
 echo "Latest released OLM version is ${LATEST_RELEASED_OLM_VERSION}"
+rm -rf ${tempfolder}

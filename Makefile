@@ -1,7 +1,7 @@
 # Current Operator version
 VERSION ?= 2.0.0-snapshot
 # Default bundle image tag
-BUNDLE_IMG ?= quay.io/kiegroup/kogito-cloud-operator:$(VERSION)
+BUNDLE_IMG ?= quay.io/kiegroup/kogito-cloud-operator-bundle:$(VERSION)
 # Options for 'bundle-build'
 ifneq ($(origin CHANNELS), undefined)
 BUNDLE_CHANNELS := --channels=$(CHANNELS)
