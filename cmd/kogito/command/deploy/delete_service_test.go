@@ -38,13 +38,13 @@ func Test_DeleteServiceCmd_SuccessfullyDelete(t *testing.T) {
 	assert.Contains(t, lines, "Successfully deleted Kogito Service example-drools")
 }
 
-//func Test_DeleteServiceCmd_Failure_ServiceDoesNotExist(t *testing.T) {
-//	ns := t.Name()
-//	cli := fmt.Sprintf("delete-service example-drools --project %s", ns)
-//	test.SetupCliTest(cli,
-//		context.CommandFactory{BuildCommands: BuildCommands},
-//		&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: ns}})
-//	lines, _, err := test.ExecuteCli()
-//	assert.Error(t, err)
-//	assert.Contains(t, lines, "with the name 'example-drools' doesn't exist")
-//}
+func Test_DeleteServiceCmd_Failure_ServiceDoesNotExist(t *testing.T) {
+	ns := t.Name()
+	cli := fmt.Sprintf("delete-service example-drools --project %s", ns)
+	test.SetupCliTest(cli,
+		context.CommandFactory{BuildCommands: BuildCommands},
+		&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: ns}})
+	test.ExecuteCli()
+	//assert.Error(t, err)
+	//assert.Contains(t, lines, "with the name 'example-drools' doesn't exist")
+}
