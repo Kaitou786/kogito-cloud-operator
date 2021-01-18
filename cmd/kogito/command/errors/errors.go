@@ -15,16 +15,14 @@
 package errors
 
 import (
-	"github.com/kiegroup/kogito-cloud-operator/pkg/logger"
-	"os"
+	"log"
 )
+
 const stdErrorReturnCode = 1
 
 // HandleError logs the error and stops the CLI execution with a non-zero return code
 func HandleError(err error) {
 	if err != nil {
-		log := logger.GetLogger("ERROR")
-		log.Info(err.Error())
-		os.Exit(stdErrorReturnCode)
+		log.Fatalf(err.Error())
 	}
 }

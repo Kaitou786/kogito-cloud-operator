@@ -44,7 +44,8 @@ func Test_DeleteServiceCmd_Failure_ServiceDoesNotExist(t *testing.T) {
 	test.SetupCliTest(cli,
 		context.CommandFactory{BuildCommands: BuildCommands},
 		&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: ns}})
-	test.ExecuteCli()
+	//test.ExecuteCli()
+	assert.PanicsWithValue(t, 1, test.RunCLI)
 	//assert.Error(t, err)
 	//assert.Contains(t, lines, "with the name 'example-drools' doesn't exist")
 }

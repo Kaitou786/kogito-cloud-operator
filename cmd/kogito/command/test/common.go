@@ -55,6 +55,9 @@ func SetupCliTestWithKubeClient(cmd string, factory context.CommandFactory, kube
 
 	return ctx
 }
+func RunCLI() {
+	ExecuteCli()
+}
 
 //ExecuteCli executes the CLI setup before executing the test
 func ExecuteCli() (string, string, error) {
