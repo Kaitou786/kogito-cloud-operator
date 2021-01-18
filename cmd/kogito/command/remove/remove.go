@@ -16,19 +16,22 @@ package remove
 
 import (
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/context"
+	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/errors"
 	"github.com/spf13/cobra"
 )
 
 type removeCommand struct {
 	context.CommandContext
-	command *cobra.Command
-	Parent  *cobra.Command
+	command      *cobra.Command
+	Parent       *cobra.Command
+	errorHandler errors.ErrorHandler
 }
 
-func initRemoveCommand(ctx *context.CommandContext, parent *cobra.Command) context.KogitoCommand {
+func initRemoveCommand(ctx *context.CommandContext, parent *cobra.Command, errorHandler errors.ErrorHandler) context.KogitoCommand {
 	cmd := removeCommand{
 		CommandContext: *ctx,
 		Parent:         parent,
+		errorHandler:   errorHandler,
 	}
 	cmd.RegisterHook()
 	cmd.InitHook()

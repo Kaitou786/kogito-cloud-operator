@@ -20,8 +20,19 @@ import (
 
 const stdErrorReturnCode = 1
 
+type ErrorHandler interface {
+	HandleError(err error)
+}
+
+type errorHandler struct {
+}
+
+func NewErrorHandler() ErrorHandler {
+	return &errorHandler{}
+}
+
 // HandleError logs the error and stops the CLI execution with a non-zero return code
-func HandleError(err error) {
+func (e *errorHandler) HandleError(err error) {
 	if err != nil {
 		log.Fatalf(err.Error())
 	}

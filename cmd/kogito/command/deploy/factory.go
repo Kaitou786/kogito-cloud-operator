@@ -16,11 +16,12 @@ package deploy
 
 import (
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/context"
+	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/errors"
 	"github.com/spf13/cobra"
 )
 
 // BuildCommands creates the commands available in this package
-func BuildCommands(ctx *context.CommandContext, rootCommand *cobra.Command) {
-	initDeleteServiceCommand(ctx, rootCommand)
-	initDeployCommand(ctx, rootCommand)
+func BuildCommands(ctx *context.CommandContext, rootCommand *cobra.Command, errorHandler errors.ErrorHandler) {
+	initDeleteServiceCommand(ctx, rootCommand, errorHandler)
+	initDeployCommand(ctx, rootCommand, errorHandler)
 }

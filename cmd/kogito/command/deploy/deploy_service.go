@@ -39,16 +39,18 @@ type deployCommand struct {
 	resourceCheckService shared.ResourceCheckService
 	buildService         service.BuildService
 	runtimeService       service.RuntimeService
+	errorHandler         errors.ErrorHandler
 }
 
 // initDeployCommand is the constructor for the deploy command
-func initDeployCommand(ctx *context.CommandContext, parent *cobra.Command) context.KogitoCommand {
+func initDeployCommand(ctx *context.CommandContext, parent *cobra.Command, errorHandler errors.ErrorHandler) context.KogitoCommand {
 	cmd := &deployCommand{
 		CommandContext:       *ctx,
 		Parent:               parent,
 		resourceCheckService: shared.NewResourceCheckService(),
 		buildService:         service.NewBuildService(ctx.Client),
 		runtimeService:       service.NewRuntimeService(),
+		errorHandler:         errorHandler,
 	}
 
 	cmd.RegisterHook()
@@ -113,13 +115,13 @@ func (i *deployCommand) Exec(cmd *cobra.Command, args []string) {
 	name := args[0]
 	project, err := i.resourceCheckService.EnsureProject(i.Client, i.flags.RuntimeFlags.Project)
 	if err != nil {
-		errors.HandleError(err)
+		i.errorHandler.HandleError(err)
 	}
 	if err = i.installBuildService(i.Client, i.flags, name, project, args); err != nil {
-		errors.HandleError(err)
+		i.errorHandler.HandleError(err)
 	}
 	if err = i.installRuntimeService(i.Client, i.flags, name, project); err != nil {
-		errors.HandleError(err)
+		i.errorHandler.HandleError(err)
 	}
 }
 

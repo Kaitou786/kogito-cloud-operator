@@ -41,6 +41,7 @@ type removeSupportingServiceCommand struct {
 	command           *cobra.Command
 	supportingService removableSupportingService
 	Parent            *cobra.Command
+	errorHandler      errors.ErrorHandler
 }
 
 var removableSupportingServices = []removableSupportingService{
@@ -75,13 +76,14 @@ var removableSupportingServices = []removableSupportingService{
 	},
 }
 
-func initRemoveSupportingServiceCommands(ctx *context.CommandContext, parent *cobra.Command) []context.KogitoCommand {
+func initRemoveSupportingServiceCommands(ctx *context.CommandContext, parent *cobra.Command, errorHandler errors.ErrorHandler) []context.KogitoCommand {
 	var commands []context.KogitoCommand
 	for _, removable := range removableSupportingServices {
 		cmd := &removeSupportingServiceCommand{
 			CommandContext:    *ctx,
 			supportingService: removable,
 			Parent:            parent,
+			errorHandler:      errorHandler,
 		}
 		cmd.RegisterHook()
 		cmd.InitHook()
@@ -120,12 +122,12 @@ func (r *removeSupportingServiceCommand) Exec(cmd *cobra.Command, args []string)
 	log := context.GetDefaultLogger()
 	var err error
 	if r.flags.namespace, err = shared.EnsureProject(r.Client, r.flags.namespace); err != nil {
-		errors.HandleError(err)
+		r.errorHandler.HandleError(err)
 	}
 	supportingServiceList := &v1beta1.KogitoSupportingServiceList{}
 	err = kubernetes.ResourceC(r.Client).ListWithNamespace(r.flags.namespace, supportingServiceList)
 	if err != nil {
-		errors.HandleError(err)
+		r.errorHandler.HandleError(err)
 	}
 
 	var targetServiceItems []v1beta1.KogitoSupportingService
@@ -137,11 +139,11 @@ func (r *removeSupportingServiceCommand) Exec(cmd *cobra.Command, args []string)
 
 	if len(targetServiceItems) == 0 {
 		log.Warnf("There's no service %s in the namespace %s", r.supportingService.cmdName, r.flags.namespace)
-		errors.HandleError(err)
+		r.errorHandler.HandleError(err)
 	}
 	for _, targetService := range targetServiceItems {
 		if err = kubernetes.ResourceC(r.Client).Delete(&targetService); err != nil {
-			errors.HandleError(fmt.Errorf("error occurs while delete Service %s from namespace %s. Error %s", r.supportingService.cmdName, targetService.Name, err))
+			r.errorHandler.HandleError(fmt.Errorf("error occurs while delete Service %s from namespace %s. Error %s", r.supportingService.cmdName, targetService.Name, err))
 		}
 		log.Infof("Service %s named %s from namespace %s has been successfully removed", r.supportingService.cmdName, targetService.Name, targetService.Namespace)
 	}

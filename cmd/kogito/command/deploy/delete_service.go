@@ -28,13 +28,14 @@ type deleteServiceFlags struct {
 	project string
 }
 
-func initDeleteServiceCommand(ctx *context.CommandContext, parent *cobra.Command) context.KogitoCommand {
+func initDeleteServiceCommand(ctx *context.CommandContext, parent *cobra.Command, errorHandler errors.ErrorHandler) context.KogitoCommand {
 	cmd := &deleteServiceCommand{
 		CommandContext:       *ctx,
 		Parent:               parent,
 		resourceCheckService: shared.NewResourceCheckService(),
 		buildService:         service.NewBuildService(ctx.Client),
 		runtimeService:       service.NewRuntimeService(),
+		errorHandler:         errorHandler,
 	}
 	cmd.RegisterHook()
 	cmd.InitHook()
@@ -49,6 +50,7 @@ type deleteServiceCommand struct {
 	resourceCheckService shared.ResourceCheckService
 	buildService         service.BuildService
 	runtimeService       service.RuntimeService
+	errorHandler         errors.ErrorHandler
 }
 
 func (i *deleteServiceCommand) RegisterHook() {
@@ -83,12 +85,12 @@ func (i *deleteServiceCommand) Exec(cmd *cobra.Command, args []string) {
 	i.flags.name = args[0]
 	var err error
 	if i.flags.project, err = i.resourceCheckService.EnsureProject(i.Client, i.flags.project); err != nil {
-		errors.HandleError(err)
+		i.errorHandler.HandleError(err)
 	}
 	if err = i.runtimeService.DeleteRuntimeService(i.Client, i.flags.name, i.flags.project); err != nil {
-		errors.HandleError(err)
+		i.errorHandler.HandleError(err)
 	}
 	if err = i.buildService.DeleteBuildService(i.flags.name, i.flags.project); err != nil {
-		errors.HandleError(err)
+		i.errorHandler.HandleError(err)
 	}
 }

@@ -16,12 +16,13 @@ package install
 
 import (
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/context"
+	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/errors"
 	"github.com/spf13/cobra"
 )
 
 // BuildCommands creates the commands available in this package
-func BuildCommands(ctx *context.CommandContext, rootCommand *cobra.Command) {
+func BuildCommands(ctx *context.CommandContext, rootCommand *cobra.Command, errorHandler errors.ErrorHandler) {
 	installCmd := initInstallCommand(ctx, rootCommand)
-	initInstallSupportingServiceCommands(ctx, installCmd.Command())
-	initInfraCommand(ctx, installCmd.Command())
+	initInstallSupportingServiceCommands(ctx, installCmd.Command(), errorHandler)
+	initInfraCommand(ctx, installCmd.Command(), errorHandler)
 }

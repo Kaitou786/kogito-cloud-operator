@@ -40,14 +40,16 @@ type infraCommand struct {
 	flags                *infraFlags
 	Parent               *cobra.Command
 	resourceCheckService shared.ResourceCheckService
+	errorHandler         errors.ErrorHandler
 }
 
 // initDeployCommand is the constructor for the deploy command
-func initInfraCommand(ctx *context.CommandContext, parent *cobra.Command) context.KogitoCommand {
+func initInfraCommand(ctx *context.CommandContext, parent *cobra.Command, errorHandler errors.ErrorHandler) context.KogitoCommand {
 	cmd := &infraCommand{
 		CommandContext:       *ctx,
 		Parent:               parent,
 		resourceCheckService: shared.NewResourceCheckService(),
+		errorHandler:         errorHandler,
 	}
 
 	cmd.RegisterHook()
@@ -108,7 +110,7 @@ func (i *infraCommand) Exec(cmd *cobra.Command, args []string) {
 	log.Debugf("Installing Kogito Infra : %s", i.flags.Name)
 	var err error
 	if i.flags.Project, err = i.resourceCheckService.EnsureProject(i.Client, i.flags.Project); err != nil {
-		errors.HandleError(err)
+		i.errorHandler.HandleError(err)
 	}
 
 	kogitoInfra := v1beta1.KogitoInfra{
@@ -133,6 +135,6 @@ func (i *infraCommand) Exec(cmd *cobra.Command, args []string) {
 		CheckOperatorCRDs().
 		InstallInfraService(&kogitoInfra).
 		GetError(); err != nil {
-		errors.HandleError(err)
+		i.errorHandler.HandleError(err)
 	}
 }

@@ -15,6 +15,7 @@
 package context
 
 import (
+	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/errors"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/client"
 	"github.com/spf13/cobra"
 )
@@ -39,5 +40,5 @@ type KogitoCommand interface {
 // CommandFactory supports inner commands creation
 type CommandFactory struct {
 	// BuildCommands creates the command hierarchy for a given feature
-	BuildCommands func(ctx *CommandContext, rootCommand *cobra.Command)
+	BuildCommands func(ctx *CommandContext, rootCommand *cobra.Command, errorHandler errors.ErrorHandler)
 }

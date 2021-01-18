@@ -16,12 +16,13 @@ package remove
 
 import (
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/context"
+	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/errors"
 	"github.com/spf13/cobra"
 )
 
 // BuildCommands creates the commands available in this package
-func BuildCommands(ctx *context.CommandContext, rootCommand *cobra.Command) {
-	removeCmd := initRemoveCommand(ctx, rootCommand)
-	initRemoveSupportingServiceCommands(ctx, removeCmd.Command())
-	initDeleteKogitoInfraCommand(ctx, removeCmd.Command())
+func BuildCommands(ctx *context.CommandContext, rootCommand *cobra.Command, errorHandler errors.ErrorHandler) {
+	removeCmd := initRemoveCommand(ctx, rootCommand, errorHandler)
+	initRemoveSupportingServiceCommands(ctx, removeCmd.Command(), errorHandler)
+	initDeleteKogitoInfraCommand(ctx, removeCmd.Command(), errorHandler)
 }

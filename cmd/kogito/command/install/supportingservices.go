@@ -46,6 +46,7 @@ type installSupportingServiceCommand struct {
 	flags             installSupportingServiceFlags
 	supportingService installableSupportingService
 	Parent            *cobra.Command
+	errorHandler      errors.ErrorHandler
 }
 
 var installableSupportingServices = []installableSupportingService{
@@ -143,13 +144,14 @@ In addition to that, it is mandatory to set the environment variable KOGITO_TRUS
 	},
 }
 
-func initInstallSupportingServiceCommands(ctx *context.CommandContext, parent *cobra.Command) []context.KogitoCommand {
+func initInstallSupportingServiceCommands(ctx *context.CommandContext, parent *cobra.Command, errorHandler errors.ErrorHandler) []context.KogitoCommand {
 	var commands []context.KogitoCommand
 	for _, installable := range installableSupportingServices {
 		cmd := &installSupportingServiceCommand{
 			CommandContext:    *ctx,
 			supportingService: installable,
 			Parent:            parent,
+			errorHandler:      errorHandler,
 		}
 		cmd.RegisterHook()
 		cmd.InitHook()
@@ -190,11 +192,11 @@ func (i *installSupportingServiceCommand) InitHook() {
 func (i *installSupportingServiceCommand) Exec(cmd *cobra.Command, args []string) {
 	var err error
 	if i.flags.Project, err = shared.EnsureProject(i.Client, i.flags.Project); err != nil {
-		errors.HandleError(err)
+		i.errorHandler.HandleError(err)
 	}
 	configMap, err := converter.CreateConfigMapFromFile(i.Client, i.supportingService.serviceName, i.flags.Project, &i.flags.ConfigFlags)
 	if err != nil {
-		errors.HandleError(err)
+		i.errorHandler.HandleError(err)
 	}
 	supportingService := &v1beta1.KogitoSupportingService{
 		ObjectMeta: metav1.ObjectMeta{
@@ -227,6 +229,6 @@ func (i *installSupportingServiceCommand) Exec(cmd *cobra.Command, args []string
 		CheckOperatorCRDs().
 		InstallSupportingService(supportingService).
 		GetError(); err != nil {
-		errors.HandleError(err)
+		i.errorHandler.HandleError(err)
 	}
 }

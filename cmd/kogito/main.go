@@ -16,6 +16,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/errors"
 	"os"
 
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command"
@@ -23,7 +24,7 @@ import (
 
 // Main starts the Kogito CLI
 func Main() error {
-	return command.DefaultBuildCommands().Execute()
+	return command.DefaultBuildCommands(errors.NewErrorHandler()).Execute()
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

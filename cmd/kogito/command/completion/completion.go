@@ -24,13 +24,14 @@ import (
 
 type completionCommand struct {
 	context.CommandContext
-	command *cobra.Command
-	Parent  *cobra.Command
+	command      *cobra.Command
+	Parent       *cobra.Command
+	errorHandler errors.ErrorHandler
 }
 
 // initCompletionCommand is the constructor for the completion command
-func initCompletionCommand(ctx *context.CommandContext, parent *cobra.Command) context.KogitoCommand {
-	cmd := &completionCommand{CommandContext: *ctx, Parent: parent}
+func initCompletionCommand(ctx *context.CommandContext, parent *cobra.Command, errorHandler errors.ErrorHandler) context.KogitoCommand {
+	cmd := &completionCommand{CommandContext: *ctx, Parent: parent, errorHandler: errorHandler}
 	cmd.RegisterHook()
 	cmd.InitHook()
 	return cmd
@@ -108,7 +109,7 @@ func (i *completionCommand) Exec(cmd *cobra.Command, args []string) {
 		err = cmd.Root().GenFishCompletion(os.Stdout, true)
 	}
 	if err != nil {
-		errors.HandleError(fmt.Errorf("Error in creating %s completion file: %v", shell, err))
+		i.errorHandler.HandleError(fmt.Errorf("Error in creating %s completion file: %v", shell, err))
 	}
 
 }

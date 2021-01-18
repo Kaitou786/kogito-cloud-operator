@@ -25,6 +25,8 @@ import (
 	"testing"
 )
 
+var handleError func(err error)
+
 func Test_DeleteServiceCmd_SuccessfullyDelete(t *testing.T) {
 	ns := t.Name()
 	cli := fmt.Sprintf("delete-service example-drools --project %s", ns)
@@ -33,8 +35,7 @@ func Test_DeleteServiceCmd_SuccessfullyDelete(t *testing.T) {
 		&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: ns}},
 		&v1beta1.KogitoRuntime{ObjectMeta: metav1.ObjectMeta{Name: "example-drools", Namespace: ns}})
 
-	lines, _, err := test.ExecuteCli()
-	assert.NoError(t, err)
+	lines, _ := test.ExecuteCli()
 	assert.Contains(t, lines, "Successfully deleted Kogito Service example-drools")
 }
 
@@ -44,8 +45,5 @@ func Test_DeleteServiceCmd_Failure_ServiceDoesNotExist(t *testing.T) {
 	test.SetupCliTest(cli,
 		context.CommandFactory{BuildCommands: BuildCommands},
 		&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: ns}})
-	//test.ExecuteCli()
-	assert.PanicsWithValue(t, 1, test.RunCLI)
-	//assert.Error(t, err)
-	//assert.Contains(t, lines, "with the name 'example-drools' doesn't exist")
+	assert.Panics(t, test.RunCLI)
 }

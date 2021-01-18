@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/test"
 	"github.com/spf13/cobra"
+	"log"
 	"strings"
 
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/context"
@@ -51,7 +52,7 @@ func SetupCliTestWithKubeClient(cmd string, factory context.CommandFactory, kube
 
 	rootCommand = kogitoRootCmd.Command()
 
-	factory.BuildCommands(ctx, rootCommand)
+	factory.BuildCommands(ctx, rootCommand, NewTestErrorHandler())
 
 	return ctx
 }
@@ -60,11 +61,13 @@ func RunCLI() {
 }
 
 //ExecuteCli executes the CLI setup before executing the test
-func ExecuteCli() (string, string, error) {
+func ExecuteCli() (string, string) {
 	if rootCommand == nil {
 		panic("RootCommand reference not found. Try calling SetupCliTest first ")
 	}
-	err := rootCommand.Execute()
+	if err := rootCommand.Execute(); err != nil {
+		log.Print(err)
+	}
 
 	defer func() {
 		rootCommand = nil
@@ -72,7 +75,7 @@ func ExecuteCli() (string, string, error) {
 		testOut = nil
 	}()
 
-	return testOut.String(), testErr.String(), err
+	return testOut.String(), testErr.String()
 }
 
 // OverrideKubeConfig overrides the default KUBECONFIG location to a temporary one

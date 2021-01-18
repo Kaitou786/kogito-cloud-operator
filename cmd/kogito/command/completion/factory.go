@@ -16,10 +16,11 @@ package completion
 
 import (
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/context"
+	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/errors"
 	"github.com/spf13/cobra"
 )
 
 // BuildCommands creates the commands available in this package
-func BuildCommands(ctx *context.CommandContext, rootCommand *cobra.Command) {
-	initCompletionCommand(ctx, rootCommand)
+func BuildCommands(ctx *context.CommandContext, rootCommand *cobra.Command, errorHandler errors.ErrorHandler) {
+	initCompletionCommand(ctx, rootCommand, errorHandler)
 }

@@ -18,6 +18,7 @@ import (
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/completion"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/context"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/deploy"
+	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/errors"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/install"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/project"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/remove"
@@ -28,20 +29,20 @@ import (
 )
 
 // DefaultBuildCommands creates a new start command for the Kogito CLI
-func DefaultBuildCommands() *cobra.Command {
-	return BuildCommands(client.NewForConsole(), os.Stdout)
+func DefaultBuildCommands(errorHandler errors.ErrorHandler) *cobra.Command {
+	return BuildCommands(client.NewForConsole(), os.Stdout, errorHandler)
 }
 
 // BuildCommands creates a customized start command for the Kogito CLI
-func BuildCommands(kubeClient *client.Client, output io.Writer) *cobra.Command {
+func BuildCommands(kubeClient *client.Client, output io.Writer, errorHandler errors.ErrorHandler) *cobra.Command {
 	ctx := &context.CommandContext{Client: kubeClient}
 
 	rootCommand := context.NewRootCommand(ctx, output)
-	completion.BuildCommands(ctx, rootCommand.Command())
-	deploy.BuildCommands(ctx, rootCommand.Command())
-	install.BuildCommands(ctx, rootCommand.Command())
-	remove.BuildCommands(ctx, rootCommand.Command())
-	project.BuildCommands(ctx, rootCommand.Command())
+	completion.BuildCommands(ctx, rootCommand.Command(), errorHandler)
+	deploy.BuildCommands(ctx, rootCommand.Command(), errorHandler)
+	install.BuildCommands(ctx, rootCommand.Command(), errorHandler)
+	remove.BuildCommands(ctx, rootCommand.Command(), errorHandler)
+	project.BuildCommands(ctx, rootCommand.Command(), errorHandler)
 
 	return rootCommand.Command()
 }
