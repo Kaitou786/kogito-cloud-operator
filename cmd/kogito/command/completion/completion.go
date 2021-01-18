@@ -17,6 +17,7 @@ package completion
 import (
 	"fmt"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/context"
+	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/errors"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -76,7 +77,7 @@ func (i *completionCommand) RegisterHook() {
     # To load completions for each session, execute once:
     $ kogito completion fish > ~/.config/fish/completions/kogito.fish
         `,
-		RunE: i.Exec,
+		Run: i.Exec,
 		// Args validation
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) != 1 {
@@ -94,7 +95,7 @@ func (i *completionCommand) InitHook() {
 	i.Parent.AddCommand(i.command)
 }
 
-func (i *completionCommand) Exec(cmd *cobra.Command, args []string) error {
+func (i *completionCommand) Exec(cmd *cobra.Command, args []string) {
 	shell := args[0]
 	var err error
 
@@ -107,8 +108,7 @@ func (i *completionCommand) Exec(cmd *cobra.Command, args []string) error {
 		err = cmd.Root().GenFishCompletion(os.Stdout, true)
 	}
 	if err != nil {
-		return fmt.Errorf("Error in creating %s completion file: %v", shell, err)
+		errors.HandleError(fmt.Errorf("Error in creating %s completion file: %v", shell, err))
 	}
 
-	return nil
 }

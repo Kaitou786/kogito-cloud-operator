@@ -16,6 +16,7 @@ package install
 
 import (
 	"fmt"
+	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/errors"
 
 	"github.com/kiegroup/kogito-cloud-operator/api/v1beta1"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/context"
@@ -72,7 +73,7 @@ func (i *infraCommand) RegisterHook() {
 	Please note that this command requires the Kogito Operator installed in the cluster.
 	For more information about the Kogito Operator installation please refer to https://github.com/kiegroup/kogito-cloud-operator#kogito-operator-installation.
 		`,
-		RunE:    i.Exec,
+		Run:     i.Exec,
 		PreRun:  i.CommonPreRun,
 		PostRun: i.CommonPostRun,
 		// Args validation
@@ -102,12 +103,12 @@ func (i *infraCommand) InitHook() {
 	i.command.Flags().StringVarP(&i.flags.Project, "project", "p", "", "The project name where the service will be deployed")
 }
 
-func (i *infraCommand) Exec(cmd *cobra.Command, args []string) (err error) {
+func (i *infraCommand) Exec(cmd *cobra.Command, args []string) {
 	log := context.GetDefaultLogger()
 	log.Debugf("Installing Kogito Infra : %s", i.flags.Name)
-
+	var err error
 	if i.flags.Project, err = i.resourceCheckService.EnsureProject(i.Client, i.flags.Project); err != nil {
-		return err
+		errors.HandleError(err)
 	}
 
 	kogitoInfra := v1beta1.KogitoInfra{
@@ -127,9 +128,11 @@ func (i *infraCommand) Exec(cmd *cobra.Command, args []string) (err error) {
 	log.Debugf("Trying to install Kogito Infra Service '%s'", kogitoInfra.Name)
 
 	// Create the Kogito infra application
-	return shared.
+	if err = shared.
 		ServicesInstallationBuilder(i.Client, i.flags.Project).
 		CheckOperatorCRDs().
 		InstallInfraService(&kogitoInfra).
-		GetError()
+		GetError(); err != nil {
+		errors.HandleError(err)
+	}
 }

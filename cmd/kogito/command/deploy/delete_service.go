@@ -17,6 +17,7 @@ package deploy
 import (
 	"fmt"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/context"
+	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/errors"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/service"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/shared"
 	"github.com/spf13/cobra"
@@ -56,7 +57,7 @@ func (i *deleteServiceCommand) RegisterHook() {
 		Use:     "delete-service NAME [flags]",
 		Short:   "Deletes a Kogito service deployed in the namespace/project",
 		Long:    `delete-service will exclude every OpenShift/Kubernetes resource created to deploy the Kogito Service into the namespace.`,
-		RunE:    i.Exec,
+		Run:     i.Exec,
 		PreRun:  i.CommonPreRun,
 		PostRun: i.CommonPostRun,
 		Args: func(cmd *cobra.Command, args []string) error {
@@ -78,16 +79,16 @@ func (i *deleteServiceCommand) InitHook() {
 	i.command.Flags().StringVarP(&i.flags.project, "project", "p", "", "The project name from where the service needs to be deleted")
 }
 
-func (i *deleteServiceCommand) Exec(cmd *cobra.Command, args []string) (err error) {
+func (i *deleteServiceCommand) Exec(cmd *cobra.Command, args []string) {
 	i.flags.name = args[0]
+	var err error
 	if i.flags.project, err = i.resourceCheckService.EnsureProject(i.Client, i.flags.project); err != nil {
-		return err
+		errors.HandleError(err)
 	}
 	if err = i.runtimeService.DeleteRuntimeService(i.Client, i.flags.name, i.flags.project); err != nil {
-		return err
+		errors.HandleError(err)
 	}
 	if err = i.buildService.DeleteBuildService(i.flags.name, i.flags.project); err != nil {
-		return err
+		errors.HandleError(err)
 	}
-	return nil
 }

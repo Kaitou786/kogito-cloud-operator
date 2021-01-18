@@ -45,6 +45,6 @@ func Test_DeleteKogitoInfraCmd_Failure_ServiceDoesNotExist(t *testing.T) {
 		context.CommandFactory{BuildCommands: BuildCommands},
 		&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: ns}})
 	lines, _, err := test.ExecuteCli()
-	assert.Error(t, err)
+	assert.NoError(t, err)
 	assert.Contains(t, lines, "kogito Infra resource with name kafka-infra not found")
 }

@@ -34,9 +34,9 @@ func TestUseProjectCmd_WhenTheresNoConfigAndNoNamespace(t *testing.T) {
 	defer teardown()
 	ns := uuid.New().String()
 	test.SetupCliTest(strings.Join([]string{"use-project", ns}, " "), context.CommandFactory{BuildCommands: BuildCommands})
-	_, _, err := test.ExecuteCli()
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), ns)
+	lines, _, err := test.ExecuteCli()
+	assert.NoError(t, err)
+	assert.Contains(t, lines, ns)
 }
 
 func TestUseProjectCmd_WhenThereIsTheNamespace(t *testing.T) {

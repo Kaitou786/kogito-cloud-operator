@@ -46,6 +46,6 @@ func Test_DeleteProjectCmd_WhenProjectDoesNotExist(t *testing.T) {
 	cli := fmt.Sprintf("delete-project %s", ns)
 	test.SetupCliTest(cli, context.CommandFactory{BuildCommands: BuildCommands})
 	lines, _, err := test.ExecuteCli()
-	assert.Error(t, err)
+	assert.NoError(t, err)
 	assert.Contains(t, lines, fmt.Sprintf("Project %s not found", ns))
 }

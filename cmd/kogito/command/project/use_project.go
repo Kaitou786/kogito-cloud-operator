@@ -17,6 +17,7 @@ package project
 import (
 	"fmt"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/context"
+	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/errors"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/message"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/shared"
 
@@ -51,7 +52,7 @@ func (i *useProjectCommand) RegisterHook() {
 		Aliases: []string{"use-ns"},
 		Short:   "Sets the Kogito Project where your Kogito Service will be deployed",
 		Long:    `use-project will set the Kubernetes Namespace where the Kogito services will be deployed. It's the Namespace/Project on Kubernetes/OpenShift world.`,
-		RunE:    i.Exec,
+		Run:     i.Exec,
 		PreRun:  i.CommonPreRun,
 		PostRun: i.CommonPostRun,
 		Args: func(cmd *cobra.Command, args []string) error {
@@ -79,19 +80,22 @@ func (i *useProjectCommand) InitHook() {
 	addProjectFlagsToCommand(i.command, &i.flags)
 }
 
-func (i *useProjectCommand) Exec(cmd *cobra.Command, args []string) error {
+func (i *useProjectCommand) Exec(cmd *cobra.Command, args []string) {
 	log := context.GetDefaultLogger()
 	if ns, err := kubernetes.NamespaceC(i.Client).Fetch(i.flags.project); err != nil {
-		return fmt.Errorf(message.ProjectErrorGetProject, err)
+		errors.HandleError(fmt.Errorf(message.ProjectErrorGetProject, err))
 	} else if ns != nil {
 		if err := shared.SetCurrentNamespaceToKubeConfig(i.flags.project); err != nil {
-			return err
+			errors.HandleError(err)
 		}
 
 		log.Infof(message.ProjectSet, i.flags.project)
 
-		return handleServicesInstallation(&i.flags, i.Client)
+		if err = handleServicesInstallation(&i.flags, i.Client); err != nil {
+			errors.HandleError(err)
+		}
+	} else {
+		errors.HandleError(fmt.Errorf(message.ProjectNotFound, i.flags.project, i.flags.project))
 	}
 
-	return fmt.Errorf(message.ProjectNotFound, i.flags.project, i.flags.project)
 }

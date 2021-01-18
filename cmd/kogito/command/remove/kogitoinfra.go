@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"github.com/kiegroup/kogito-cloud-operator/api/v1beta1"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/context"
+	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/errors"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/shared"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/client/kubernetes"
 	"github.com/spf13/cobra"
@@ -54,7 +55,7 @@ func (i *deleteKogitoInfraServiceCommand) RegisterHook() {
 		Use:     "kogito-infra NAME [flags]",
 		Short:   "remove Kogito infra service deployed in the OpenShift/Kubernetes cluster",
 		Long:    `remove kogito-infra will exclude every OpenShift/Kubernetes resource created to deploy the Kogito Infra Service into the namespace.`,
-		RunE:    i.Exec,
+		Run:     i.Exec,
 		PreRun:  i.CommonPreRun,
 		PostRun: i.CommonPostRun,
 		Args: func(cmd *cobra.Command, args []string) error {
@@ -76,14 +77,15 @@ func (i *deleteKogitoInfraServiceCommand) InitHook() {
 	i.command.Flags().StringVarP(&i.flags.project, "project", "p", "", "The project name from where the service needs to be deleted")
 }
 
-func (i *deleteKogitoInfraServiceCommand) Exec(cmd *cobra.Command, args []string) (err error) {
+func (i *deleteKogitoInfraServiceCommand) Exec(cmd *cobra.Command, args []string) {
 	log := context.GetDefaultLogger()
 	i.flags.name = args[0]
+	var err error
 	if i.flags.project, err = i.resourceCheckService.EnsureProject(i.Client, i.flags.project); err != nil {
-		return err
+		errors.HandleError(err)
 	}
 	if err := i.resourceCheckService.CheckKogitoInfraExists(i.Client, i.flags.name, i.flags.project); err != nil {
-		return err
+		errors.HandleError(err)
 	}
 	log.Debugf("About to delete infra service %s in namespace %s", i.flags.name, i.flags.project)
 	if err := kubernetes.ResourceC(i.Client).Delete(&v1beta1.KogitoInfra{
@@ -92,8 +94,7 @@ func (i *deleteKogitoInfraServiceCommand) Exec(cmd *cobra.Command, args []string
 			Namespace: i.flags.project,
 		},
 	}); err != nil {
-		return err
+		errors.HandleError(err)
 	}
 	log.Infof("Successfully deleted Kogito Infra Service %s in the Project %s", i.flags.name, i.flags.project)
-	return nil
 }

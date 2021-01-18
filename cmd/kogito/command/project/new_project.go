@@ -17,6 +17,7 @@ package project
 import (
 	"fmt"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/context"
+	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/errors"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/message"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/shared"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/client/kubernetes"
@@ -51,7 +52,7 @@ func (i *newProjectCommand) RegisterHook() {
 		Short:   "Creates a new Kogito Project for your Kogito Services",
 		Long: `new-project will create a Kubernetes Namespace with the provided project where your Kogito Services will be deployed. This project then will be used to deploy all infrastructure
 				bits needed for the deployed Kogito Services to run.`,
-		RunE:    i.Exec,
+		Run:     i.Exec,
 		PreRun:  i.CommonPreRun,
 		PostRun: i.CommonPostRun,
 		Args: func(cmd *cobra.Command, args []string) error {
@@ -72,27 +73,28 @@ func (i *newProjectCommand) InitHook() {
 	addProjectFlagsToCommand(i.command, &i.flags)
 }
 
-func (i *newProjectCommand) Exec(cmd *cobra.Command, args []string) error {
+func (i *newProjectCommand) Exec(cmd *cobra.Command, args []string) {
 	log := context.GetDefaultLogger()
 	ns, err := kubernetes.NamespaceC(i.Client).Fetch(i.flags.project)
 	if err != nil {
-		return err
+		errors.HandleError(err)
 	}
 	if ns == nil {
 		ns, err := kubernetes.NamespaceC(i.Client).Create(i.flags.project)
 		if err != nil {
-			return err
+			errors.HandleError(err)
 		}
 
 		if err := shared.SetCurrentNamespaceToKubeConfig(ns.Name); err != nil {
-			return err
+			errors.HandleError(err)
 		}
 
 		log.Infof(message.ProjectCreatedSuccessfully, ns.Name)
 
-		return handleServicesInstallation(&i.flags, i.Client)
+		if err = handleServicesInstallation(&i.flags, i.Client); err != nil {
+			errors.HandleError(err)
+		}
 	}
 
 	log.Infof(message.ProjectAlreadyExists, i.flags.project)
-	return nil
 }

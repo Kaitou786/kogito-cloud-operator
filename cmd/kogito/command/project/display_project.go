@@ -52,7 +52,7 @@ func (i *displayProjectCommand) RegisterHook() {
 		Aliases: []string{"ns"},
 		Short:   "Display the current used project",
 		Long:    `project will print the Kubernetes Namespace where the Kogito services will be deployed. It's the Namespace/Project on Kubernetes/OpenShift world.`,
-		RunE:    i.Exec,
+		Run:     i.Exec,
 		PreRun:  i.CommonPreRun,
 		PostRun: i.CommonPostRun,
 		Args:    func(cmd *cobra.Command, args []string) error { return nil },
@@ -64,7 +64,7 @@ func (i *displayProjectCommand) InitHook() {
 	i.Parent.AddCommand(i.command)
 }
 
-func (i *displayProjectCommand) Exec(cmd *cobra.Command, args []string) error {
+func (i *displayProjectCommand) Exec(cmd *cobra.Command, args []string) {
 	log := context.GetDefaultLogger()
 	currentProject := shared.GetCurrentNamespaceFromKubeConfig()
 	if len(currentProject) > 0 {
@@ -73,5 +73,4 @@ func (i *displayProjectCommand) Exec(cmd *cobra.Command, args []string) error {
 		log.Info(message.ProjectNoProjectConfigured)
 	}
 
-	return nil
 }

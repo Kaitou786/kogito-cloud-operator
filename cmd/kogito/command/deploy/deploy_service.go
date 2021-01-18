@@ -17,6 +17,7 @@ package deploy
 import (
 	"fmt"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/context"
+	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/errors"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/flag"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/service"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/shared"
@@ -75,7 +76,7 @@ func (i *deployCommand) RegisterHook() {
 	Please note that this command requires the Kogito Operator installed in the cluster.
 	For more information about the Kogito Operator installation please refer to https://github.com/kiegroup/kogito-cloud-operator#kogito-operator-installation.
 		`,
-		RunE:    i.Exec,
+		Run:     i.Exec,
 		PreRun:  i.CommonPreRun,
 		PostRun: i.CommonPostRun,
 		// Args validation
@@ -108,19 +109,18 @@ func (i *deployCommand) InitHook() {
 	flag.AddRuntimeTypeFlags(i.command, &i.flags.RuntimeTypeFlags)
 }
 
-func (i *deployCommand) Exec(cmd *cobra.Command, args []string) (err error) {
+func (i *deployCommand) Exec(cmd *cobra.Command, args []string) {
 	name := args[0]
 	project, err := i.resourceCheckService.EnsureProject(i.Client, i.flags.RuntimeFlags.Project)
 	if err != nil {
-		return err
+		errors.HandleError(err)
 	}
 	if err = i.installBuildService(i.Client, i.flags, name, project, args); err != nil {
-		return err
+		errors.HandleError(err)
 	}
 	if err = i.installRuntimeService(i.Client, i.flags, name, project); err != nil {
-		return err
+		errors.HandleError(err)
 	}
-	return nil
 }
 
 func (i *deployCommand) installBuildService(cli *client.Client, flags *deployFlags, name, project string, args []string) error {

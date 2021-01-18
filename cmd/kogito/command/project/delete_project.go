@@ -17,6 +17,7 @@ package project
 import (
 	"fmt"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/context"
+	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/errors"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/shared"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/client/kubernetes"
 	"github.com/spf13/cobra"
@@ -56,7 +57,7 @@ func (i *deleteProjectCommand) RegisterHook() {
 		Use:     "delete-project NAME",
 		Short:   "Deletes a Kogito Project - i.e., the Kubernetes/OpenShift project",
 		Long:    `delete-project will exclude the project/project entirely, including all deployed services and infrastructure.`,
-		RunE:    i.Exec,
+		Run:     i.Exec,
 		PreRun:  i.CommonPreRun,
 		PostRun: i.CommonPostRun,
 		Args: func(cmd *cobra.Command, args []string) error {
@@ -73,20 +74,19 @@ func (i *deleteProjectCommand) InitHook() {
 	i.Parent.AddCommand(i.command)
 }
 
-func (i *deleteProjectCommand) Exec(cmd *cobra.Command, args []string) error {
+func (i *deleteProjectCommand) Exec(cmd *cobra.Command, args []string) {
 	log := context.GetDefaultLogger()
 	i.flags.name = args[0]
 	var err error
 	if i.flags.name, err = shared.EnsureProject(i.Client, i.flags.name); err != nil {
-		return err
+		errors.HandleError(err)
 	}
 
 	log.Debugf("About to delete project %s", i.flags.name)
 	if err := kubernetes.ResourceC(i.Client).Delete(&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: i.flags.name}}); err != nil {
-		return err
+		errors.HandleError(err)
 	}
 
 	log.Infof("Successfully deleted Kogito Project %s", i.flags.name)
 
-	return nil
 }

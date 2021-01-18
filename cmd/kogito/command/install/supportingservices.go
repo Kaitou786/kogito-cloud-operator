@@ -19,6 +19,7 @@ import (
 	"github.com/kiegroup/kogito-cloud-operator/api/v1beta1"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/context"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/converter"
+	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/errors"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/flag"
 	"github.com/kiegroup/kogito-cloud-operator/cmd/kogito/command/shared"
 	"github.com/kiegroup/kogito-cloud-operator/pkg/infrastructure"
@@ -168,7 +169,7 @@ func (i *installSupportingServiceCommand) RegisterHook() {
 		Short:   fmt.Sprintf("Installs the Kogito %s Service in the given Project", i.supportingService.displayName),
 		Example: fmt.Sprintf("install %s -p my-project", i.supportingService.cmdName),
 		Long:    i.supportingService.description,
-		RunE:    i.Exec,
+		Run:     i.Exec,
 		PreRun:  i.CommonPreRun,
 		PostRun: i.CommonPostRun,
 		Args: func(cmd *cobra.Command, args []string) error {
@@ -186,14 +187,14 @@ func (i *installSupportingServiceCommand) InitHook() {
 	flag.AddInstallFlags(i.command, &i.flags.InstallFlags)
 }
 
-func (i *installSupportingServiceCommand) Exec(cmd *cobra.Command, args []string) error {
+func (i *installSupportingServiceCommand) Exec(cmd *cobra.Command, args []string) {
 	var err error
 	if i.flags.Project, err = shared.EnsureProject(i.Client, i.flags.Project); err != nil {
-		return err
+		errors.HandleError(err)
 	}
 	configMap, err := converter.CreateConfigMapFromFile(i.Client, i.supportingService.serviceName, i.flags.Project, &i.flags.ConfigFlags)
 	if err != nil {
-		return err
+		errors.HandleError(err)
 	}
 	supportingService := &v1beta1.KogitoSupportingService{
 		ObjectMeta: metav1.ObjectMeta{
@@ -221,9 +222,11 @@ func (i *installSupportingServiceCommand) Exec(cmd *cobra.Command, args []string
 		},
 	}
 
-	return shared.
+	if err = shared.
 		ServicesInstallationBuilder(i.Client, i.flags.Project).
 		CheckOperatorCRDs().
 		InstallSupportingService(supportingService).
-		GetError()
+		GetError(); err != nil {
+		errors.HandleError(err)
+	}
 }
